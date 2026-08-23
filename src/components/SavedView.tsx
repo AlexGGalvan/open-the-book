@@ -107,6 +107,10 @@ function MemorizePanel({ store }: { store: OpenBookStore }) {
   }, [defaultPassage.id, memorize.passageId, store.savedVerses]);
 
   const practicedText = useMemo(
+    () => buildPracticeText(memorize.text, practiceLevel).text,
+    [memorize.text, practiceLevel],
+  );
+  const practiceStats = useMemo(
     () => buildPracticeText(memorize.text, practiceLevel),
     [memorize.text, practiceLevel],
   );
@@ -145,9 +149,23 @@ function MemorizePanel({ store }: { store: OpenBookStore }) {
       </label>
 
       <div className="rounded-[24px] border border-white/10 bg-[#080604]/72 p-5">
-        <p className="mb-4 text-sm uppercase tracking-[0.24em] text-[#d7c5a1]">
-          {memorize.reference}
-        </p>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm uppercase tracking-[0.24em] text-[#d7c5a1]">
+            {memorize.reference}
+          </p>
+          <span className="rounded-full border border-[#f4dfb8]/18 bg-[#f4dfb8]/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#f4dfb8]">
+            {practiceStats.visiblePercent}% visible · {practiceStats.hiddenPercent}% oculto
+          </span>
+        </div>
+        <div
+          aria-hidden="true"
+          className="mb-5 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
+        >
+          <div
+            className="h-full rounded-full bg-[#f4dfb8] transition-all duration-300"
+            style={{ width: `${practiceStats.visiblePercent}%` }}
+          />
+        </div>
         <p className="font-serif text-2xl leading-10 text-[#fff7e9]" aria-live="polite">
           {practicedText}
         </p>
@@ -159,7 +177,7 @@ function MemorizePanel({ store }: { store: OpenBookStore }) {
           className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#f4dfb8] px-5 text-sm font-semibold text-[#17110c] transition hover:bg-[#fff1d2]"
           onClick={() => setPracticeLevel((level) => Math.min(3, level + 1))}
         >
-          Practice
+          Practicar
         </button>
         <button
           type="button"
@@ -167,7 +185,7 @@ function MemorizePanel({ store }: { store: OpenBookStore }) {
           onClick={() => setPracticeLevel(0)}
         >
           <RotateCcw aria-hidden="true" size={16} />
-          Reveal
+          Revelar
         </button>
       </div>
     </section>
@@ -176,13 +194,18 @@ function MemorizePanel({ store }: { store: OpenBookStore }) {
 
 function buildPracticeText(text: string, level: number) {
   if (level === 0) {
-    return text;
+    return {
+      text,
+      hiddenPercent: 0,
+      visiblePercent: 100,
+    };
   }
 
   const frequency = level === 1 ? 7 : level === 2 ? 4 : 2;
   let wordIndex = 0;
+  let hiddenCount = 0;
 
-  return text
+  const practicedText = text
     .split(/(\s+)/)
     .map((token) => {
       if (/^\s+$/.test(token)) {
@@ -190,7 +213,20 @@ function buildPracticeText(text: string, level: number) {
       }
 
       wordIndex += 1;
-      return wordIndex % frequency === 0 && token.length > 2 ? "______" : token;
+      if (wordIndex % frequency === 0 && token.length > 2) {
+        hiddenCount += 1;
+        return "______";
+      }
+
+      return token;
     })
     .join("");
+
+  const hiddenPercent = wordIndex > 0 ? Math.round((hiddenCount / wordIndex) * 100) : 0;
+
+  return {
+    text: practicedText,
+    hiddenPercent,
+    visiblePercent: 100 - hiddenPercent,
+  };
 }

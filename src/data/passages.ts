@@ -28,6 +28,18 @@ export const passages: Passage[] = [
     source,
   },
   {
+    id: "romans-3-10-12",
+    book: "Romanos",
+    chapter: 3,
+    verses: "10-12",
+    reference: "Romanos 3:10-12",
+    themes: ["perdon", "fe", "proposito"],
+    text: "10 Como está escrito: No hay justo, ni aun uno; 11 No hay quien entienda, No hay quien busque a Dios. 12 Todos se desviaron, a una se hicieron inútiles; No hay quien haga lo bueno, no hay ni siquiera uno.",
+    context:
+      "Pablo reúne una serie de citas para mostrar la necesidad universal de gracia. El pasaje prepara el contraste con la justicia de Dios presentada en Cristo.",
+    source: "Texto proporcionado por el usuario",
+  },
+  {
     id: "philippians-4-6-7",
     book: "Filipenses",
     chapter: 4,
