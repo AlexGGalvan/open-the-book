@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OPEN THE BOOK
 
-## Getting Started
+Mobile-first Next.js prototype for a contemplative Bible NFC experience.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://127.0.0.1:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## NFC routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/?t=main` opens the main experience.
+- `/?t=journal` opens Journey directly.
+- `/?t=study` opens Read directly.
+- `/?t=guest` opens the independent guest experience.
 
-## Learn More
+## Data and persistence
 
-To learn more about Next.js, take a look at the following resources:
+- User state is device-local through `src/lib/storageService.ts`.
+- Demo data is separated in `src/data/demo.ts` and never seeded into `localStorage`.
+- Bible passages are in `src/data/passages.ts`, using Reina-Valera 1909 public-domain text from the `open-bibles` project.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Validation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+npm run build
+```
 
-## Deploy on Vercel
+## GitHub Pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The repository includes `.github/workflows/deploy-pages.yml`. On GitHub, set
+Pages to deploy from GitHub Actions, then push to `master` or `main`.

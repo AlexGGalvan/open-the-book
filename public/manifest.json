@@ -1,0 +1,19 @@
+{
+  "name": "Open the Book",
+  "short_name": "Open Book",
+  "description": "A quiet place between you and the Word.",
+  "start_url": "./?t=main",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050403",
+  "theme_color": "#080604",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/book-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

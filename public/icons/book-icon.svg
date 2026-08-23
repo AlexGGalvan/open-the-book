@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Open the Book icon">
+  <rect width="512" height="512" rx="112" fill="#080604"/>
+  <path d="M98 152c0-24 19-43 43-43h82c30 0 57 15 73 38 16-23 43-38 73-38h2c24 0 43 19 43 43v226c0 11-9 20-20 20h-49c-35 0-66 18-84 48-6 10-20 10-26 0-18-30-49-48-84-48h-53c-11 0-20-9-20-20V152Z" fill="#f4dfb8" opacity=".92"/>
+  <path d="M256 153v247M139 158h74c24 0 43 19 43 43m117-43h-4c-24 0-43 19-43 43v174" fill="none" stroke="#17110c" stroke-width="18" stroke-linecap="round"/>
+  <path d="M151 213h65M151 260h65M151 307h65M340 213h39M340 260h39M340 307h39" stroke="#17110c" stroke-width="16" stroke-linecap="round" opacity=".72"/>
+</svg>
