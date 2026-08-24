@@ -1,6 +1,7 @@
 import type {
   LastReading,
   MemorizeVerse,
+  MeetingSummary,
   ReadingHistoryEntry,
   ReflectionEntry,
   SavedVerse,
@@ -14,6 +15,7 @@ const keys = {
   savedVerses: "open-the-book:saved-verses",
   history: "open-the-book:history",
   memorize: "open-the-book:memorize",
+  meetingSummaries: "open-the-book:meeting-summaries",
 };
 
 export const defaultPreferences: UserPreferences = {
@@ -121,6 +123,22 @@ export const storageService = {
   saveMemorizeVerse(verse: MemorizeVerse) {
     writeJson(keys.memorize, verse);
     return verse;
+  },
+
+  getMeetingSummaries() {
+    return readJson<MeetingSummary[]>(keys.meetingSummaries, []);
+  },
+
+  saveMeetingSummary(summary: MeetingSummary) {
+    const next = [summary, ...this.getMeetingSummaries()].slice(0, 60);
+    writeJson(keys.meetingSummaries, next);
+    return next;
+  },
+
+  deleteMeetingSummary(id: string) {
+    const next = this.getMeetingSummaries().filter((summary) => summary.id !== id);
+    writeJson(keys.meetingSummaries, next);
+    return next;
   },
 
   clearUserData() {

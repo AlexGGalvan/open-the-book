@@ -10,6 +10,7 @@ import {
 import type {
   LastReading,
   MemorizeVerse,
+  MeetingSummary,
   Passage,
   ReadingHistoryEntry,
   ReflectionEntry,
@@ -35,6 +36,7 @@ export function useOpenBookStore() {
   const [savedVerses, setSavedVerses] = useState<SavedVerse[]>([]);
   const [readingHistory, setReadingHistory] = useState<ReadingHistoryEntry[]>([]);
   const [memorizeVerse, setMemorizeVerse] = useState<MemorizeVerse | null>(null);
+  const [meetingSummaries, setMeetingSummaries] = useState<MeetingSummary[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,6 +52,7 @@ export function useOpenBookStore() {
       setSavedVerses(storageService.getSavedVerses());
       setReadingHistory(storageService.getReadingHistory());
       setMemorizeVerse(storageService.getMemorizeVerse());
+      setMeetingSummaries(storageService.getMeetingSummaries());
       setHydrated(true);
     });
 
@@ -175,6 +178,23 @@ export function useOpenBookStore() {
     tapHaptic(10);
   }, []);
 
+  const saveMeetingSummary = useCallback((summary: Omit<MeetingSummary, "id" | "date">) => {
+    const nextSummary: MeetingSummary = {
+      ...summary,
+      id: createId("meeting"),
+      date: new Date().toISOString(),
+    };
+
+    setMeetingSummaries(storageService.saveMeetingSummary(nextSummary));
+    tapHaptic([8, 24, 8]);
+    return nextSummary;
+  }, []);
+
+  const deleteMeetingSummary = useCallback((id: string) => {
+    setMeetingSummaries(storageService.deleteMeetingSummary(id));
+    tapHaptic(8);
+  }, []);
+
   const markIntroSeen = useCallback(() => {
     updatePreferences({ introSeen: true });
   }, [updatePreferences]);
@@ -188,6 +208,7 @@ export function useOpenBookStore() {
     setSavedVerses([]);
     setReadingHistory([]);
     setMemorizeVerse(null);
+    setMeetingSummaries([]);
   }, []);
 
   return {
@@ -198,6 +219,7 @@ export function useOpenBookStore() {
     savedVerses,
     readingHistory,
     memorizeVerse,
+    meetingSummaries,
     allPassages: passages,
     updatePreferences,
     markIntroSeen,
@@ -208,6 +230,8 @@ export function useOpenBookStore() {
     saveVerse,
     removeSavedVerse,
     setMemorizePassage,
+    saveMeetingSummary,
+    deleteMeetingSummary,
     clearUserData,
   };
 }

@@ -77,6 +77,25 @@ export interface MemorizeVerse {
   text: string;
 }
 
+export interface MeetingScripture {
+  reference: string;
+  connection: string;
+  confidence: "alta" | "media" | "baja";
+}
+
+export interface MeetingSummary {
+  id: string;
+  date: string;
+  title: string;
+  mainTheme: string;
+  summary: string;
+  scriptures: MeetingScripture[];
+  keyIdeas: string[];
+  connections: string[];
+  reflectionPrompt: string;
+  detectedText?: string;
+}
+
 export interface UserPreferences {
   introSeen: boolean;
   readingTheme: ReadingTheme;

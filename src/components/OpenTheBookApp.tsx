@@ -8,6 +8,7 @@ import { GuestExperience } from "@/components/GuestExperience";
 import { HomeView } from "@/components/HomeView";
 import { IntroExperience } from "@/components/IntroExperience";
 import { JourneyView } from "@/components/JourneyView";
+import { MeetingNotesView } from "@/components/MeetingNotesView";
 import { PassageView } from "@/components/PassageView";
 import { ProfileView } from "@/components/ProfileView";
 import { ReadingMode } from "@/components/ReadingMode";
@@ -18,19 +19,29 @@ import { useOpenBookStore } from "@/hooks/useOpenBookStore";
 import { tapHaptic } from "@/lib/haptics";
 import type { Passage, ThemeKey } from "@/types/bible";
 
-type Surface = "app" | "intro" | "guest";
+type Surface = "app" | "intro" | "guest" | "meeting";
 
 export function OpenTheBookApp() {
   const searchParams = useSearchParams();
   const initialTarget = searchParams.get("t");
   const store = useOpenBookStore();
   const [surface, setSurface] = useState<Surface>(() =>
-    initialTarget === "guest" ? "guest" : "app",
+    initialTarget === "guest"
+      ? "guest"
+      : initialTarget === "meeting" || initialTarget === "notes"
+        ? "meeting"
+        : "app",
   );
   const [activeTab, setActiveTab] = useState<AppTab>(() =>
     initialTarget === "journal" ? "journey" : initialTarget === "study" ? "read" : "home",
   );
-  const [skipIntroForNfc] = useState(() => initialTarget === "journal" || initialTarget === "study");
+  const [skipIntroForNfc] = useState(
+    () =>
+      initialTarget === "journal" ||
+      initialTarget === "study" ||
+      initialTarget === "meeting" ||
+      initialTarget === "notes",
+  );
   const [selectedPassage, setSelectedPassage] = useState<Passage | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>("amor");
   const [readingMode, setReadingMode] = useState(false);
@@ -38,6 +49,7 @@ export function OpenTheBookApp() {
   const shouldShowIntro =
     store.hydrated &&
     surface !== "guest" &&
+    surface !== "meeting" &&
     (surface === "intro" || (!store.preferences.introSeen && !skipIntroForNfc));
 
   const isSelectedSaved = useMemo(
@@ -72,6 +84,7 @@ export function OpenTheBookApp() {
   function handleTabChange(tab: AppTab) {
     setSelectedPassage(null);
     setReadingMode(false);
+    setSurface("app");
     setActiveTab(tab);
     tapHaptic(6);
   }
@@ -94,7 +107,15 @@ export function OpenTheBookApp() {
       <div className="paper-grain fixed inset-0 opacity-[0.28]" />
       <div className="relative z-10 mx-auto w-full max-w-[520px] px-4 py-6 sm:px-6">
         <AnimatePresence mode="wait">
-          {selectedPassage ? (
+          {surface === "meeting" ? (
+            <MeetingNotesView
+              store={store}
+              onBackHome={() => {
+                setSurface("app");
+                setActiveTab("home");
+              }}
+            />
+          ) : selectedPassage ? (
             <PassageView
               passage={selectedPassage}
               selectedTheme={selectedTheme}
