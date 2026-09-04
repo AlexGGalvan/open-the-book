@@ -17,7 +17,7 @@ const actionClass =
 
 export function TodayMannaCard({ dateLabel, manna }: TodayMannaCardProps) {
   const [copied, setCopied] = useState(false);
-  const shareText = formatPassageForSharing(manna.text, manna.reference);
+  const shareText = formatPassageForSharing(manna.text, manna.reference, manna.translation);
 
   async function handleCopy() {
     await copyTextToClipboard(shareText);

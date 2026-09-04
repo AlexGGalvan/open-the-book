@@ -108,6 +108,7 @@ export type BiblePassage = {
   text?: string;
   translation?: string;
   source?: string;
+  copyrightNotice?: string;
 };
 
 export type MemorizationVerse = BiblePassage & {

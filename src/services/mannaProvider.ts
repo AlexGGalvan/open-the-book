@@ -1,4 +1,5 @@
 import mannaItems from "@/data/manna.json";
+import { getRvr1960Passage } from "@/data/rvr1960Passages";
 import { getDaysDifference, getLocalDate, mod, type DateInput } from "@/lib/dates";
 import type { Manna } from "@/types/bible";
 
@@ -63,15 +64,19 @@ export async function getBibleHabitMannaForDate(
   }
 
   const text = getNonKoreanVerseText(payload.verses);
+  const spanishPassage = getRvr1960Passage(reference);
+  const resolvedText = text ?? spanishPassage?.text;
 
   return {
     id: `bible-habit-${payload.id}`,
     date: payload.dateKey,
     reference,
     title: "Pasaje de hoy",
-    text,
+    text: resolvedText,
+    translation: spanishPassage?.translation,
+    copyrightNotice: spanishPassage?.copyrightNotice,
     reflection:
-      text === undefined
+      resolvedText === undefined
         ? "Referencia sincronizada desde Bible Habit. El texto se mostrará cuando conectemos una traducción bíblica autorizada."
         : undefined,
     source: payload.source ? `Bible Habit API: ${payload.source}` : "Bible Habit API",

@@ -23,7 +23,7 @@ export function WeeklyMemorizationCard({ selection }: WeeklyMemorizationCardProp
   const [practiceEnabled, setPracticeEnabled] = useState(false);
   const [copied, setCopied] = useState(false);
   const { verse } = selection;
-  const shareText = formatPassageForSharing(verse.text, verse.reference);
+  const shareText = formatPassageForSharing(verse.text, verse.reference, verse.translation);
   const dateRange = `${formatLocalDate(selection.weekStartDate)} al ${formatLocalDate(
     selection.weekEndDate,
   )}`;

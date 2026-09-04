@@ -59,7 +59,9 @@ El provider remoto consulta:
 https://api--bible-habit-server--26zn8kx8mjzy.code.run/api/daily-manna/today
 ```
 
-El APK confirma esta ruta dentro del módulo `everyday_manna`. La respuesta actual de Bible Habit trae la referencia diaria y textos desde `source: jbch`; si el texto llega en coreano, la web solo usa la referencia y deja el texto pendiente hasta conectar una traducción bíblica autorizada.
+El APK confirma esta ruta dentro del módulo `everyday_manna`. La respuesta actual de Bible Habit trae la referencia diaria y textos desde `source: jbch`; si el texto llega en coreano, la web busca un override permitido en `src/data/rvr1960Passages.ts`. Si no existe override, solo usa la referencia y deja el texto pendiente hasta conectar una traducción bíblica autorizada.
+
+RVR1960 tiene copyright. No se usa como una Biblia completa local; solo se incluyen citas puntuales con aviso de derechos.
 
 Si existe un registro local con la fecha exacta, `getMannaForDate` lo usa. Si no existe, rota los datos demo de forma diaria desde `MANNA_CONFIG.anchorDate`.
 

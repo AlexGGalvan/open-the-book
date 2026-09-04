@@ -19,6 +19,11 @@ export async function copyTextToClipboard(text: string) {
   document.body.removeChild(textarea);
 }
 
-export function formatPassageForSharing(text: string | undefined, reference: string) {
-  return text ? `${text}\n\n— ${reference}` : reference;
+export function formatPassageForSharing(
+  text: string | undefined,
+  reference: string,
+  translation?: string,
+) {
+  const citation = translation ? `${reference} (${translation})` : reference;
+  return text ? `${text}\n\n— ${citation}` : citation;
 }

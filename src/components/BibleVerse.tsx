@@ -14,6 +14,7 @@ export function BibleVerse({
   textOverride,
 }: BibleVerseProps) {
   const text = textOverride ?? passage.text;
+  const isLongPassage = text ? text.length > 520 : false;
 
   if (!text) {
     return (
@@ -32,11 +33,23 @@ export function BibleVerse({
 
   return (
     <blockquote className={className}>
-      <p className="font-serif text-[1.62rem] font-medium leading-[1.42] text-[#171511] sm:text-[2rem]">
+      <p
+        className={
+          isLongPassage
+            ? "whitespace-pre-line font-serif text-lg font-medium leading-8 text-[#171511] sm:text-xl"
+            : "font-serif text-[1.62rem] font-medium leading-[1.42] text-[#171511] sm:text-[2rem]"
+        }
+      >
         {text}
       </p>
       {showReference ? (
-        <footer className="mt-5 text-sm font-medium text-[#736b5c]">— {passage.reference}</footer>
+        <footer className="mt-5 text-sm font-medium text-[#736b5c]">
+          — {passage.reference}
+          {passage.translation ? ` · ${passage.translation}` : ""}
+        </footer>
+      ) : null}
+      {passage.copyrightNotice ? (
+        <p className="mt-3 text-xs leading-5 text-[#8a8173]">{passage.copyrightNotice}</p>
       ) : null}
     </blockquote>
   );
