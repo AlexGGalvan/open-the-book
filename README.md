@@ -51,7 +51,17 @@ type Manna = {
 };
 ```
 
-`src/services/mannaProvider.ts` contiene `getMannaForDate(date)`. Si existe un registro con la fecha exacta, lo usa. Si no existe, rota los datos demo de forma diaria desde `MANNA_CONFIG.anchorDate`.
+`src/services/mannaProvider.ts` contiene `getMannaForDate(date)` como fallback local y `getBibleHabitMannaForDate(date)` como provider remoto.
+
+El provider remoto consulta:
+
+```text
+https://api--bible-habit-server--26zn8kx8mjzy.code.run/api/daily-manna/today
+```
+
+El APK confirma esta ruta dentro del módulo `everyday_manna`. La respuesta actual de Bible Habit trae la referencia diaria y textos desde `source: jbch`; si el texto llega en coreano, la web solo usa la referencia y deja el texto pendiente hasta conectar una traducción bíblica autorizada.
+
+Si existe un registro local con la fecha exacta, `getMannaForDate` lo usa. Si no existe, rota los datos demo de forma diaria desde `MANNA_CONFIG.anchorDate`.
 
 Cuando exista una fuente real, cambia el provider para leer desde JSON completo, API, base de datos o contenido extraído de Bible Habit sin tocar los componentes visuales.
 

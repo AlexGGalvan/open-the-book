@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { TodayMannaCard } from "@/components/TodayMannaCard";
 import { WeeklyMemorizationCard } from "@/components/WeeklyMemorizationCard";
 import { MEMORIZATION_CONFIG } from "@/config/memorization";
 import { formatLocalDate, getGreeting, getLocalDate } from "@/lib/dates";
-import { getMannaForDate } from "@/services/mannaProvider";
+import { getBibleHabitMannaForDate, getMannaForDate } from "@/services/mannaProvider";
 import {
   getMemorizationForDate,
   type MemorizationSelection,
@@ -48,22 +48,43 @@ function registerServiceWorker() {
 export function DailyMannaApp() {
   const [dailyState, setDailyState] = useState<DailyMannaState | null>(null);
 
+  const refreshDailyState = useCallback(async () => {
+    const baseState = getDailyMannaState();
+
+    setDailyState((currentState) => {
+      if (currentState?.manna.id.startsWith("bible-habit-")) {
+        return { ...baseState, manna: currentState.manna };
+      }
+
+      return baseState;
+    });
+
+    try {
+      const remoteManna = await getBibleHabitMannaForDate(new Date(), MEMORIZATION_CONFIG.timezone);
+      setDailyState((currentState) =>
+        currentState ? { ...currentState, manna: remoteManna } : { ...baseState, manna: remoteManna },
+      );
+    } catch {
+      setDailyState(baseState);
+    }
+  }, []);
+
   useEffect(() => {
     registerServiceWorker();
 
     const initialTimer = window.setTimeout(() => {
-      setDailyState(getDailyMannaState());
+      refreshDailyState();
     }, 0);
 
     const timer = window.setInterval(() => {
-      setDailyState(getDailyMannaState());
+      refreshDailyState();
     }, 60 * 1000);
 
     return () => {
       window.clearTimeout(initialTimer);
       window.clearInterval(timer);
     };
-  }, []);
+  }, [refreshDailyState]);
 
   if (!dailyState) {
     return (

@@ -18,9 +18,14 @@ export function BibleVerse({
   if (!text) {
     return (
       <div
-        className={`rounded-lg border border-dashed border-[#d8cda9] bg-[#fffaf0] px-4 py-5 text-sm leading-6 text-[#7a6f60] ${className}`}
+        className={`rounded-lg border border-dashed border-[#d8cda9] bg-[#fffaf0] px-4 py-5 ${className}`}
       >
-        Texto bíblico pendiente para esta referencia.
+        <p className="font-serif text-3xl font-semibold leading-tight text-[#171511]">
+          {passage.reference}
+        </p>
+        <p className="mt-3 text-sm leading-6 text-[#7a6f60]">
+          Texto bíblico pendiente de una traducción autorizada.
+        </p>
       </div>
     );
   }
