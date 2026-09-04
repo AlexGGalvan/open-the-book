@@ -18,29 +18,29 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://open-the-book.app"),
+  metadataBase: new URL("https://alexggalvan.github.io/open-the-book/"),
   title: {
-    default: "OPEN THE BOOK",
-    template: "%s · OPEN THE BOOK",
+    default: "Daily Manna | Palabra y memorización bíblica",
+    template: "%s | Daily Manna",
   },
-  description: "A quiet place between you and the Word.",
-  applicationName: "Open the Book",
+  description: "Una palabra diaria y un pasaje semanal para memorizar y meditar en la Biblia.",
+  applicationName: "Daily Manna",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Open the Book",
+    statusBarStyle: "default",
+    title: "Daily Manna",
   },
   openGraph: {
-    title: "OPEN THE BOOK",
-    description: "A quiet place between you and the Word.",
+    title: "Daily Manna | Palabra y memorización bíblica",
+    description: "Una palabra diaria y un pasaje semanal para memorizar y meditar en la Biblia.",
     type: "website",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080604",
-  colorScheme: "dark light",
+  themeColor: "#fbf8f1",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       lang="es"
       className={`${inter.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#050403] font-sans">{children}</body>
+      <body className="min-h-full bg-[#fbf8f1] font-sans">{children}</body>
     </html>
   );
 }

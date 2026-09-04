@@ -1,12 +1,12 @@
 {
-  "name": "Open the Book",
-  "short_name": "Open Book",
-  "description": "A quiet place between you and the Word.",
-  "start_url": "./?t=main",
+  "name": "Daily Manna",
+  "short_name": "Manna",
+  "description": "Una palabra diaria y un pasaje semanal para memorizar y meditar en la Biblia.",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050403",
-  "theme_color": "#080604",
+  "background_color": "#fbf8f1",
+  "theme_color": "#fbf8f1",
   "orientation": "portrait",
   "icons": [
     {

@@ -1,9 +1,8 @@
-const CACHE_NAME = "open-the-book-v1";
+const CACHE_NAME = "daily-manna-v1";
 const basePath = new URL(self.registration.scope).pathname.replace(/\/$/, "");
 const withBase = (path) => `${basePath}${path}` || path;
 const CORE_ASSETS = [
   withBase("/"),
-  withBase("/?t=main"),
   withBase("/manifest.json"),
   withBase("/icons/book-icon.svg"),
 ];

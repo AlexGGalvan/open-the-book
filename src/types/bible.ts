@@ -102,3 +102,29 @@ export interface UserPreferences {
   fontScale: number;
   lineHeight: number;
 }
+
+export type BiblePassage = {
+  reference: string;
+  text?: string;
+  translation?: string;
+  source?: string;
+};
+
+export type MemorizationVerse = BiblePassage & {
+  id: string;
+  topic: string;
+  book?: string;
+  chapter?: number;
+  verseStart?: number;
+  verseEnd?: number;
+  isDemo?: boolean;
+  isCalibrationAnchor?: boolean;
+};
+
+export type Manna = BiblePassage & {
+  id: string;
+  date?: string;
+  title?: string;
+  reflection?: string;
+  isDemo?: boolean;
+};

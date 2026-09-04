@@ -1,0 +1,66 @@
+[
+  {
+    "id": "demo-manna-2026-09-04",
+    "date": "2026-09-04",
+    "reference": "Mateo 6:11",
+    "title": "Pan para hoy",
+    "text": "Danos hoy nuestro pan cotidiano.",
+    "reflection": "Recibe este día sin prisa. Dios no te llama a cargar mañana antes de tiempo.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  },
+  {
+    "id": "demo-manna-001",
+    "reference": "Salmos 23:1",
+    "title": "Nada faltará",
+    "text": "JEHOVÁ es mi pastor; nada me faltará.",
+    "reflection": "Antes de buscar control, vuelve a la confianza sencilla: estás bajo cuidado.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  },
+  {
+    "id": "demo-manna-002",
+    "reference": "Lamentaciones 3:22-23",
+    "title": "Misericordias nuevas",
+    "text": "Por la misericordia de Jehová no hemos sido consumidos, porque nunca decayeron sus misericordias. Nuevas son cada mañana; grande es tu fidelidad.",
+    "reflection": "La mañana no borra todo, pero sí puede abrir una medida nueva de gracia.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  },
+  {
+    "id": "demo-manna-003",
+    "reference": "Salmos 119:105",
+    "title": "Luz suficiente",
+    "text": "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.",
+    "reflection": "A veces Dios no alumbra todo el mapa; alumbra el paso que toca dar.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  },
+  {
+    "id": "demo-manna-004",
+    "reference": "Isaías 26:3",
+    "title": "Paz guardada",
+    "text": "Tú le guardarás en completa paz, cuyo pensamiento en ti persevera; porque en ti se ha confiado.",
+    "reflection": "La paz crece cuando el pensamiento aprende a descansar en una presencia firme.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  },
+  {
+    "id": "demo-manna-005",
+    "reference": "Juan 6:35",
+    "title": "El pan de vida",
+    "text": "Y Jesús les dijo: Yo soy el pan de vida: el que á mí viene, nunca tendrá hambre; y el que en mí cree, no tendrá sed jamás.",
+    "reflection": "La necesidad más profunda del alma no se atiende con prisa, sino acercándose a Cristo.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  },
+  {
+    "id": "demo-manna-006",
+    "reference": "Filipenses 4:6-7",
+    "title": "Oración antes que ansiedad",
+    "text": "Por nada estéis afanosos; sino sean notorias vuestras peticiones delante de Dios en toda oración y ruego, con hacimiento de gracias. Y la paz de Dios, que sobrepuja todo entendimiento, guardará vuestros corazones y vuestros entendimientos en Cristo Jesús.",
+    "reflection": "Entrégale a Dios lo que estás intentando resolver solo.",
+    "translation": "Reina-Valera 1909",
+    "isDemo": true
+  }
+]
