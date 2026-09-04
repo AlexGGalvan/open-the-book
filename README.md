@@ -125,15 +125,11 @@ Para integrar traducciones en el futuro:
 
 No agregues una traducción completa sin confirmar licencia y permiso de uso.
 
-## PWA
+## Cache y PWA
 
-La base PWA está preparada con:
+La app ya no registra un service worker ni guarda el estado actual en `localStorage`. Al abrirse, borra las claves antiguas del sitio y desregistra cualquier service worker previo para evitar que el celular conserve versiones viejas.
 
-- `public/manifest.json`;
-- `public/sw.js`;
-- registro del service worker en producción desde la pantalla principal.
-
-Después se pueden agregar iconos PNG de varios tamaños para una instalación más pulida en iPhone y Android.
+`public/sw.js` se conserva solo como limpiador de transición para usuarios que ya tenían una versión cacheada instalada.
 
 ## GitHub Pages
 

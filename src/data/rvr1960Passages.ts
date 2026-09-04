@@ -22,6 +22,22 @@ const rvr1960PassagesByReference: Record<string, BiblePassage> = {
 26 Así que, yo de esta manera corro, no como a la ventura; de esta manera peleo, no como quien golpea el aire,
 27 sino que golpeo mi cuerpo, y lo pongo en servidumbre, no sea que habiendo sido heraldo para otros, yo mismo venga a ser eliminado.`,
   },
+  "1 Corintios 10:23-33": {
+    reference: "1 Corintios 10:23-33",
+    translation: RVR1960_TRANSLATION,
+    copyrightNotice: RVR1960_COPYRIGHT_NOTICE,
+    text: `23 Todo me es lícito, pero no todo conviene; todo me es lícito, pero no todo edifica.
+24 Ninguno busque su propio bien, sino el del otro.
+25 De todo lo que se vende en la carnicería, comed, sin preguntar nada por motivos de conciencia;
+26 porque del Señor es la tierra y su plenitud.
+27 Si algún incrédulo os invita, y queréis ir, de todo lo que se os ponga delante comed, sin preguntar nada por motivos de conciencia.
+28 Mas si alguien os dijere: Esto fue sacrificado a los ídolos; no lo comáis, por causa de aquel que lo declaró, y por motivos de conciencia; porque del Señor es la tierra y su plenitud.
+29 La conciencia, digo, no la tuya, sino la del otro. Pues ¿por qué se ha de juzgar mi libertad por la conciencia de otro?
+30 Y si yo con agradecimiento participo, ¿por qué he de ser censurado por aquello de que doy gracias?
+31 Si, pues, coméis o bebéis, o hacéis otra cosa, hacedlo todo para la gloria de Dios.
+32 No seáis tropiezo ni a judíos, ni a gentiles, ni a la iglesia de Dios;
+33 como también yo en todas las cosas agrado a todos, no procurando mi propio beneficio, sino el de muchos, para que sean salvos.`,
+  },
   "Eclesiastés 11:9": {
     reference: "Eclesiastés 11:9",
     translation: RVR1960_TRANSLATION,

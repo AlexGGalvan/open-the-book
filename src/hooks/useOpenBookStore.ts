@@ -61,17 +61,6 @@ export function useOpenBookStore() {
     };
   }, []);
 
-  useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      "serviceWorker" in navigator &&
-      process.env.NODE_ENV === "production"
-    ) {
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-      navigator.serviceWorker.register(`${basePath}/sw.js`).catch(() => undefined);
-    }
-  }, []);
-
   const updatePreferences = useCallback((partial: Partial<UserPreferences>) => {
     setPreferences((current) => {
       const next = { ...current, ...partial };

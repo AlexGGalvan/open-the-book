@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Brain, Check, CheckCircle2, Copy, Eye, EyeOff } from "lucide-react";
 import { BibleVerse } from "@/components/BibleVerse";
 import { PracticeMode } from "@/components/PracticeMode";
 import { ShareButton } from "@/components/ShareButton";
 import { copyTextToClipboard, formatPassageForSharing } from "@/lib/clipboard";
 import { formatLocalDate } from "@/lib/dates";
-import { isVerseMemorized, setVerseMemorized } from "@/lib/storage";
 import type { MemorizationSelection } from "@/services/memorizationProvider";
 
 type WeeklyMemorizationCardProps = {
@@ -28,14 +27,6 @@ export function WeeklyMemorizationCard({ selection }: WeeklyMemorizationCardProp
     selection.weekEndDate,
   )}`;
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setMemorized(isVerseMemorized(verse.id));
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, [verse.id]);
-
   async function handleCopy() {
     await copyTextToClipboard(shareText);
     setCopied(true);
@@ -43,9 +34,7 @@ export function WeeklyMemorizationCard({ selection }: WeeklyMemorizationCardProp
   }
 
   function handleMemorized() {
-    const nextValue = !memorized;
-    setVerseMemorized(verse.id, nextValue);
-    setMemorized(nextValue);
+    setMemorized((current) => !current);
   }
 
   function handleHideText() {

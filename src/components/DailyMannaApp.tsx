@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { TodayMannaCard } from "@/components/TodayMannaCard";
 import { WeeklyMemorizationCard } from "@/components/WeeklyMemorizationCard";
 import { MEMORIZATION_CONFIG } from "@/config/memorization";
+import { clearAppBrowserPersistence } from "@/lib/browserPersistence";
 import { formatLocalDate, getGreeting, getLocalDate } from "@/lib/dates";
 import { getBibleHabitMannaForDate, getMannaForDate } from "@/services/mannaProvider";
 import {
@@ -32,19 +33,6 @@ function getDailyMannaState(): DailyMannaState {
   };
 }
 
-function registerServiceWorker() {
-  if (
-    typeof navigator === "undefined" ||
-    !("serviceWorker" in navigator) ||
-    process.env.NODE_ENV !== "production"
-  ) {
-    return;
-  }
-
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-  navigator.serviceWorker.register(`${basePath}/sw.js`).catch(() => undefined);
-}
-
 export function DailyMannaApp() {
   const [dailyState, setDailyState] = useState<DailyMannaState | null>(null);
 
@@ -70,7 +58,7 @@ export function DailyMannaApp() {
   }, []);
 
   useEffect(() => {
-    registerServiceWorker();
+    void clearAppBrowserPersistence();
 
     const initialTimer = window.setTimeout(() => {
       refreshDailyState();
