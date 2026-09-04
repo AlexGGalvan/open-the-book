@@ -131,6 +131,8 @@ La app ya no registra un service worker ni guarda el estado actual en `localStor
 
 `public/sw.js` se conserva solo como limpiador de transición para usuarios que ya tenían una versión cacheada instalada.
 
+Las llamadas a Bible Habit agregan un parámetro temporal de cache-bust para que un service worker antiguo no reutilice respuestas viejas de `daily-manna/today`.
+
 ## GitHub Pages
 
 El workflow `.github/workflows/deploy-pages.yml` exporta el sitio con Next.js y lo publica en GitHub Pages cuando se hace push a `main` o `master`.

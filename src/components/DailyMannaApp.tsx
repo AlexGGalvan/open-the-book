@@ -58,18 +58,24 @@ export function DailyMannaApp() {
   }, []);
 
   useEffect(() => {
-    void clearAppBrowserPersistence();
+    let cancelled = false;
 
-    const initialTimer = window.setTimeout(() => {
-      refreshDailyState();
-    }, 0);
+    async function prepareAndRefresh() {
+      await clearAppBrowserPersistence();
+
+      if (!cancelled) {
+        await refreshDailyState();
+      }
+    }
+
+    void prepareAndRefresh();
 
     const timer = window.setInterval(() => {
-      refreshDailyState();
+      void refreshDailyState();
     }, 60 * 1000);
 
     return () => {
-      window.clearTimeout(initialTimer);
+      cancelled = true;
       window.clearInterval(timer);
     };
   }, [refreshDailyState]);

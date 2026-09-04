@@ -45,7 +45,12 @@ export async function getBibleHabitMannaForDate(
   timezone = MANNA_CONFIG.timezone,
 ): Promise<Manna> {
   const fallback = getMannaForDate(date, timezone);
-  const response = await fetch(MANNA_CONFIG.bibleHabitApiUrl, {
+  const dateKey = getLocalDate(date, timezone);
+  const requestUrl = new URL(MANNA_CONFIG.bibleHabitApiUrl);
+  requestUrl.searchParams.set("clientDate", dateKey);
+  requestUrl.searchParams.set("cacheBust", String(Date.now()));
+
+  const response = await fetch(requestUrl.toString(), {
     headers: {
       Accept: "application/json",
     },

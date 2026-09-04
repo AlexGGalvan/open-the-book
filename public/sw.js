@@ -9,6 +9,23 @@ async function clearAppCaches() {
   await Promise.all(keys.filter(shouldDeleteCache).map((key) => caches.delete(key)));
 }
 
+async function reloadWindowClients() {
+  const clients = await self.clients.matchAll({
+    includeUncontrolled: true,
+    type: "window",
+  });
+
+  await Promise.all(
+    clients.map((client) => {
+      if ("navigate" in client) {
+        return client.navigate(client.url);
+      }
+
+      return undefined;
+    }),
+  );
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(clearAppCaches().then(() => self.skipWaiting()));
 });
@@ -17,6 +34,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     clearAppCaches()
       .then(() => self.clients.claim())
-      .then(() => self.registration.unregister()),
+      .then(() => self.registration.unregister())
+      .then(() => reloadWindowClients()),
   );
 });
