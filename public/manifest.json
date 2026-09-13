@@ -1,7 +1,7 @@
 {
-  "name": "Daily Manna",
-  "short_name": "Manna",
-  "description": "Una palabra diaria y un pasaje semanal para memorizar y meditar en la Biblia.",
+  "name": "Recitación de la semana",
+  "short_name": "Recitación",
+  "description": "Memorizaciones bíblicas semanales para recitar y practicar.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -41,8 +41,16 @@ const tabClass =
 
 export function WeeklyRecitationCard() {
   const [activeTab, setActiveTab] = useState<RecitationTab>("current");
+  const [hideCurrentVerse, setHideCurrentVerse] = useState(false);
   const activeRecitation = recitations.find((item) => item.id === activeTab) ?? recitations[0];
   const activePanelId = `recitation-panel-${activeRecitation.id}`;
+  const shouldMaskVerse = activeRecitation.id === "current" && hideCurrentVerse;
+  const passage = shouldMaskVerse
+    ? {
+        ...activeRecitation.passage,
+        text: maskEightyPercent(activeRecitation.passage.text ?? ""),
+      }
+    : activeRecitation.passage;
 
   return (
     <section
@@ -106,13 +114,15 @@ export function WeeklyRecitationCard() {
         {activeRecitation.progress ? (
           <button
             aria-label={`Memorización al ${activeRecitation.progress}%`}
-            className="mt-5 w-full rounded-md border border-[#c7d8bf] bg-[#f0f8ea] px-4 py-3 text-left text-[#486831] shadow-[0_10px_24px_rgba(50,62,43,0.08)] focus:outline-none focus:ring-2 focus:ring-[#9eb7d1]"
+            aria-pressed={hideCurrentVerse}
+            className="mt-5 w-full rounded-md border border-[#c7d8bf] bg-[#f0f8ea] px-4 py-3 text-left text-[#486831] shadow-[0_10px_24px_rgba(50,62,43,0.08)] transition hover:bg-[#e9f4e1] focus:outline-none focus:ring-2 focus:ring-[#9eb7d1]"
+            onClick={() => setHideCurrentVerse((current) => !current)}
             type="button"
           >
             <span className="flex items-center justify-between gap-3 text-sm font-bold">
               <span className="inline-flex items-center gap-2">
                 <CheckCircle2 aria-hidden="true" size={18} />
-                Memorización
+                {hideCurrentVerse ? "Mostrar versículo" : "Ocultar 80%"}
               </span>
               <span>{activeRecitation.progress}%</span>
             </span>
@@ -128,8 +138,26 @@ export function WeeklyRecitationCard() {
         <p className="mt-6 text-sm font-semibold uppercase text-[#8a641a]">
           Texto para recitar
         </p>
-        <BibleVerse passage={activeRecitation.passage} className="mt-4" />
+        <BibleVerse passage={passage} className="mt-4" />
       </div>
     </section>
   );
+}
+
+function maskEightyPercent(text: string) {
+  let wordIndex = 0;
+
+  return text
+    .split(/(\s+)/)
+    .map((token) => {
+      if (!token.trim()) {
+        return token;
+      }
+
+      const shouldShow = wordIndex % 5 === 0;
+      wordIndex += 1;
+
+      return shouldShow ? token : "____";
+    })
+    .join("");
 }

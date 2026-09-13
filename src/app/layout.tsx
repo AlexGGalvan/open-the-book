@@ -20,20 +20,20 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL("https://alexggalvan.github.io/open-the-book/"),
   title: {
-    default: "Daily Manna | Palabra y memorización bíblica",
-    template: "%s | Daily Manna",
+    default: "Recitación de la semana",
+    template: "%s | Recitación de la semana",
   },
-  description: "Una palabra diaria y un pasaje semanal para memorizar y meditar en la Biblia.",
-  applicationName: "Daily Manna",
+  description: "Memorizaciones bíblicas semanales para recitar y practicar.",
+  applicationName: "Recitación de la semana",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Daily Manna",
+    title: "Recitación",
   },
   openGraph: {
-    title: "Daily Manna | Palabra y memorización bíblica",
-    description: "Una palabra diaria y un pasaje semanal para memorizar y meditar en la Biblia.",
+    title: "Recitación de la semana",
+    description: "Memorizaciones bíblicas semanales para recitar y practicar.",
     type: "website",
   },
 };
