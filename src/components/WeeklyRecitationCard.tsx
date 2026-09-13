@@ -11,14 +11,12 @@ type RecitationItem = {
   id: RecitationTab;
   label: string;
   passage: BiblePassage;
-  progress?: number;
 };
 
 const recitations: RecitationItem[] = [
   {
     id: "current",
     label: "Esta semana",
-    progress: 80,
     passage: {
       reference: "Santiago 2:26",
       text: "Porque como el cuerpo sin espíritu está muerto, así también la fe sin obras está muerta.",
@@ -111,27 +109,16 @@ export function WeeklyRecitationCard() {
           </p>
         </div>
 
-        {activeRecitation.progress ? (
+        {activeRecitation.id === "current" ? (
           <button
-            aria-label={`Memorización al ${activeRecitation.progress}%`}
+            aria-label={hideCurrentVerse ? "Mostrar versículo completo" : "Practicar memoria"}
             aria-pressed={hideCurrentVerse}
-            className="mt-5 w-full rounded-md border border-[#c7d8bf] bg-[#f0f8ea] px-4 py-3 text-left text-[#486831] shadow-[0_10px_24px_rgba(50,62,43,0.08)] transition hover:bg-[#e9f4e1] focus:outline-none focus:ring-2 focus:ring-[#9eb7d1]"
+            className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#c7d8bf] bg-[#f0f8ea] px-4 text-sm font-bold text-[#486831] shadow-[0_10px_24px_rgba(50,62,43,0.08)] transition hover:bg-[#e9f4e1] focus:outline-none focus:ring-2 focus:ring-[#9eb7d1]"
             onClick={() => setHideCurrentVerse((current) => !current)}
             type="button"
           >
-            <span className="flex items-center justify-between gap-3 text-sm font-bold">
-              <span className="inline-flex items-center gap-2">
-                <CheckCircle2 aria-hidden="true" size={18} />
-                {hideCurrentVerse ? "Mostrar versículo" : "Ocultar 80%"}
-              </span>
-              <span>{activeRecitation.progress}%</span>
-            </span>
-            <span className="mt-3 block h-2 overflow-hidden rounded-full bg-white">
-              <span
-                className="block h-full rounded-full bg-[#57713e]"
-                style={{ width: `${activeRecitation.progress}%` }}
-              />
-            </span>
+            <CheckCircle2 aria-hidden="true" size={18} />
+            <span>{hideCurrentVerse ? "Mostrar versículo" : "Practicar memoria"}</span>
           </button>
         ) : null}
 
