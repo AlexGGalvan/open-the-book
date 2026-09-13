@@ -5,10 +5,16 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fbf8f1",
-  "theme_color": "#fbf8f1",
+  "background_color": "#eafffb",
+  "theme_color": "#1ab7db",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "./logos/recitation-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "./icons/book-icon.svg",
       "sizes": "any",

@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
-import { BookOpen, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { BibleVerse } from "@/components/BibleVerse";
 import type { BiblePassage } from "@/types/bible";
 
@@ -35,11 +36,12 @@ const recitations: RecitationItem[] = [
 ];
 
 const tabClass =
-  "flex min-h-11 flex-1 items-center justify-center rounded-md px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#9eb7d1]";
+  "flex min-h-11 flex-1 items-center justify-center rounded-md px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#36d9e6]";
 
 export function WeeklyRecitationCard() {
   const [activeTab, setActiveTab] = useState<RecitationTab>("current");
   const [hideCurrentVerse, setHideCurrentVerse] = useState(false);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   const activeRecitation = recitations.find((item) => item.id === activeTab) ?? recitations[0];
   const activePanelId = `recitation-panel-${activeRecitation.id}`;
   const shouldMaskVerse = activeRecitation.id === "current" && hideCurrentVerse;
@@ -53,23 +55,29 @@ export function WeeklyRecitationCard() {
   return (
     <section
       aria-labelledby="weekly-recitation-title"
-      className="rounded-lg border border-[#d7decd] bg-[#fbfdf8] p-5 shadow-[0_20px_60px_rgba(50,62,43,0.08)] sm:p-7"
+      className="overflow-hidden rounded-lg border border-[#9cebf0] bg-white/95 p-5 shadow-[0_26px_80px_rgba(0,82,150,0.16)] sm:p-7"
     >
-      <div className="flex items-start gap-3">
-        <div className="grid size-10 shrink-0 place-items-center rounded-md border border-[#cddbc2] bg-white text-[#57713e]">
-          <BookOpen aria-hidden="true" size={20} />
-        </div>
-        <div>
-          <p className="text-xs font-bold uppercase text-[#57713e]">Recitación</p>
-          <h2 id="weekly-recitation-title" className="mt-2 text-2xl font-semibold text-[#171511]">
-            Recitación de la semana
-          </h2>
-        </div>
+      <div className="flex flex-col items-center text-center">
+        <Image
+          alt="Logo con paloma y globo"
+          className="h-28 w-28 rounded-full drop-shadow-[0_16px_22px_rgba(0,80,145,0.22)] sm:h-32 sm:w-32"
+          height={128}
+          priority
+          src={`${basePath}/logos/recitation-logo.png`}
+          width={128}
+        />
+        <p className="mt-5 text-xs font-bold uppercase text-[#007cb3]">Recitación</p>
+        <h2
+          id="weekly-recitation-title"
+          className="mt-2 font-serif text-4xl font-semibold leading-none text-[#00589d] sm:text-5xl"
+        >
+          Recitación de la semana
+        </h2>
       </div>
 
       <div
         aria-label="Recitación semanal"
-        className="mt-7 grid grid-cols-2 gap-2 rounded-lg border border-[#e0d9bf] bg-white/72 p-1"
+        className="mt-7 grid grid-cols-2 gap-2 rounded-lg border border-[#bdeff2] bg-[#effdfb] p-1"
         role="tablist"
       >
         {recitations.map((item) => {
@@ -82,8 +90,8 @@ export function WeeklyRecitationCard() {
               aria-selected={selected}
               className={`${tabClass} ${
                 selected
-                  ? "bg-[#163a62] text-white shadow-[0_8px_18px_rgba(22,58,98,0.18)]"
-                  : "text-[#5f6756] hover:bg-[#f3f6ef]"
+                  ? "bg-[#00589d] text-white shadow-[0_10px_22px_rgba(0,88,157,0.22)]"
+                  : "text-[#00689d] hover:bg-white"
               }`}
               id={`recitation-tab-${item.id}`}
               onClick={() => setActiveTab(item.id)}
@@ -102,9 +110,9 @@ export function WeeklyRecitationCard() {
         id={activePanelId}
         role="tabpanel"
       >
-        <div className="rounded-lg border border-[#e0d9bf] bg-white/72 p-4 sm:p-5">
-          <p className="text-sm font-semibold text-[#6f685d]">Referencia</p>
-          <p className="mt-1 font-serif text-3xl font-semibold text-[#171511]">
+        <div className="border-b border-[#bdeff2] pb-5">
+          <p className="text-sm font-semibold text-[#007cb3]">Referencia</p>
+          <p className="mt-1 font-serif text-3xl font-semibold text-[#073a5a]">
             {activeRecitation.passage.reference}
           </p>
         </div>
@@ -113,7 +121,7 @@ export function WeeklyRecitationCard() {
           <button
             aria-label={hideCurrentVerse ? "Mostrar versículo completo" : "Practicar memoria"}
             aria-pressed={hideCurrentVerse}
-            className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#c7d8bf] bg-[#f0f8ea] px-4 text-sm font-bold text-[#486831] shadow-[0_10px_24px_rgba(50,62,43,0.08)] transition hover:bg-[#e9f4e1] focus:outline-none focus:ring-2 focus:ring-[#9eb7d1]"
+            className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#88e7ef] bg-[#e8fbfb] px-4 text-sm font-bold text-[#00589d] shadow-[0_12px_28px_rgba(0,82,150,0.12)] transition hover:border-[#1dbbdd] hover:bg-white focus:outline-none focus:ring-2 focus:ring-[#36d9e6]"
             onClick={() => setHideCurrentVerse((current) => !current)}
             type="button"
           >
@@ -122,7 +130,7 @@ export function WeeklyRecitationCard() {
           </button>
         ) : null}
 
-        <p className="mt-6 text-sm font-semibold uppercase text-[#8a641a]">
+        <p className="mt-6 text-sm font-semibold uppercase text-[#008bb8]">
           Texto para recitar
         </p>
         <BibleVerse passage={passage} className="mt-4" />

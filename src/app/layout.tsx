@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fbf8f1",
+  themeColor: "#eafffb",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       lang="es"
       className={`${inter.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#fbf8f1] font-sans">{children}</body>
+      <body className="min-h-full bg-[#eafffb] font-sans">{children}</body>
     </html>
   );
 }

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf8f1;
-  --foreground: #171511;
+  --background: #eafffb;
+  --foreground: #073a5a;
 }
 
 @theme inline {
@@ -25,16 +25,18 @@ input {
 }
 
 ::selection {
-  background: rgba(22, 58, 98, 0.18);
-  color: #171511;
+  background: rgba(26, 183, 219, 0.28);
+  color: #073a5a;
 }
 
-.manna-texture {
+.recitation-texture {
   background-image:
-    linear-gradient(180deg, rgba(22, 58, 98, 0.055), rgba(251, 248, 241, 0) 320px),
-    linear-gradient(90deg, rgba(208, 163, 58, 0.06) 1px, transparent 1px),
-    linear-gradient(rgba(22, 58, 98, 0.035) 1px, transparent 1px);
+    linear-gradient(132deg, rgba(91, 232, 222, 0.58), rgba(255, 255, 255, 0.92) 48%, rgba(239, 246, 241, 0.92)),
+    linear-gradient(24deg, rgba(0, 83, 151, 0.12), transparent 38%),
+    linear-gradient(90deg, rgba(0, 174, 219, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(0, 91, 161, 0.06) 1px, transparent 1px);
   background-size:
+    100% 100%,
     100% 100%,
     34px 34px,
     34px 34px;
