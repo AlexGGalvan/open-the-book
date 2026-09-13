@@ -3,22 +3,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { TodayMannaCard } from "@/components/TodayMannaCard";
-import { WeeklyMemorizationCard } from "@/components/WeeklyMemorizationCard";
+import { WeeklyRecitationCard } from "@/components/WeeklyRecitationCard";
 import { MEMORIZATION_CONFIG } from "@/config/memorization";
 import { clearAppBrowserPersistence } from "@/lib/browserPersistence";
 import { formatLocalDate, getGreeting, getLocalDate } from "@/lib/dates";
 import { getBibleHabitMannaForDate, getMannaForDate } from "@/services/mannaProvider";
-import {
-  getMemorizationForDate,
-  type MemorizationSelection,
-} from "@/services/memorizationProvider";
 import type { Manna } from "@/types/bible";
 
 type DailyMannaState = {
   greeting: string;
   dateLabel: string;
   manna: Manna;
-  memorization: MemorizationSelection;
 };
 
 function getDailyMannaState(): DailyMannaState {
@@ -29,7 +24,6 @@ function getDailyMannaState(): DailyMannaState {
     greeting: getGreeting(now),
     dateLabel: formatLocalDate(dateKey),
     manna: getMannaForDate(now, MEMORIZATION_CONFIG.timezone),
-    memorization: getMemorizationForDate(now),
   };
 }
 
@@ -99,7 +93,7 @@ export function DailyMannaApp() {
 
           <div className="space-y-5 pb-10">
             <TodayMannaCard dateLabel={dailyState.dateLabel} manna={dailyState.manna} />
-            <WeeklyMemorizationCard selection={dailyState.memorization} />
+            <WeeklyRecitationCard />
           </div>
 
           <footer className="mt-auto pb-5 pt-2 text-center text-xs leading-5 text-[#82796c]">
