@@ -19,8 +19,8 @@ const recitations: RecitationItem[] = [
     id: "current",
     label: "Esta semana",
     passage: {
-      reference: "Santiago 2:26",
-      text: "Porque como el cuerpo sin espíritu está muerto, así también la fe sin obras está muerta.",
+      reference: "Eclesiastés 3:20-21",
+      text: "Todo va a un mismo lugar; todo es hecho del polvo, y todo volverá al mismo polvo. ¿Quién sabe que el espíritu de los hijos de los hombres sube arriba, y que el espíritu del animal desciende abajo a la tierra?",
       translation: "Reina-Valera 1960",
     },
   },
@@ -28,8 +28,8 @@ const recitations: RecitationItem[] = [
     id: "next",
     label: "Próxima semana",
     passage: {
-      reference: "Eclesiastés 3:20-21",
-      text: "Todo va a un mismo lugar; todo es hecho del polvo, y todo volverá al mismo polvo. ¿Quién sabe que el espíritu de los hijos de los hombres sube arriba, y que el espíritu del animal desciende abajo a la tierra?",
+      reference: "Romanos 14:11-12",
+      text: "Porque escrito está: Vivo yo, dice el Señor, que ante mí se doblará toda rodilla, y toda lengua confesará a Dios. De manera que cada uno de nosotros dará a Dios cuenta de sí.",
       translation: "Reina-Valera 1960",
     },
   },
