@@ -100,8 +100,11 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
   const activeLineIndex = getActiveLyricIndex(currentTime, song.lyrics);
   const displayLineIndex = activeLineIndex >= 0 ? activeLineIndex : 0;
   const activeLine = song.lyrics[displayLineIndex] ?? null;
-  const previousLine = activeLineIndex > 0 ? song.lyrics[activeLineIndex - 1] : null;
   const nextLine = song.lyrics[displayLineIndex + 1] ?? null;
+  const nextPreviewLine =
+    activeLine && nextLine && !areLyricsVisuallyDuplicate(activeLine.text, nextLine.text)
+      ? nextLine
+      : null;
   const progress = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
   const lyricPages = useMemo(
     () => createLyricPages(song.lyrics, song.lyricPageStarts),
@@ -176,16 +179,28 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
       </div>
 
       <div className="mt-6 overflow-hidden rounded-lg border border-[#bdeff2] bg-[#effdfb] shadow-[0_16px_34px_rgba(0,82,150,0.08)]">
-        <div className="bg-[#00589d] px-5 py-7 text-center text-white sm:px-7 sm:py-8">
-          <p className="min-h-7 font-serif text-lg font-semibold leading-snug text-white/70">
-            {previousLine?.text ?? " "}
-          </p>
-          <p className="mt-3 font-serif text-[2.05rem] font-semibold leading-tight sm:text-[2.55rem]">
-            {activeLine?.text ?? song.lyrics[0]?.text}
-          </p>
-          <p className="mt-3 min-h-8 font-serif text-xl font-semibold leading-snug text-white/75 sm:text-2xl">
-            {nextLine?.text ?? " "}
-          </p>
+        <div className="relative overflow-hidden bg-[#00589d] px-5 py-8 text-center text-white sm:px-7 sm:py-10">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(54,217,230,0.22),transparent_42%),linear-gradient(135deg,rgba(255,255,255,0.06),transparent_55%)]" />
+          <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-white/30" />
+          <div className="relative mx-auto max-w-2xl">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-white/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#36d9e6]" />
+              Ahora
+            </div>
+            <p className="mt-5 font-serif text-[2.05rem] font-semibold leading-tight sm:text-[2.6rem]">
+              {activeLine?.text ?? song.lyrics[0]?.text}
+            </p>
+            {nextPreviewLine ? (
+              <p className="mx-auto mt-5 max-w-xl border-t border-white/20 pt-4 text-sm font-semibold leading-snug text-white/70 sm:text-base">
+                <span className="mr-2 text-xs font-bold uppercase tracking-[0.2em] text-[#9cebf0]">
+                  Siguiente
+                </span>
+                {nextPreviewLine.text}
+              </p>
+            ) : (
+              <div className="mx-auto mt-6 h-0.5 w-20 bg-[#36d9e6]/80" />
+            )}
+          </div>
         </div>
 
         <div className="p-4 sm:p-5">
@@ -437,6 +452,17 @@ function getActivePageIndex(lineIndex: number, lyricPages: IndexedLyricLine[][])
   );
 
   return pageIndex >= 0 ? pageIndex : 0;
+}
+
+function areLyricsVisuallyDuplicate(first: string, second: string) {
+  const normalizeLyric = (text: string) =>
+    text
+      .replace(/\([^)]*\)/g, "")
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim()
+      .toLocaleLowerCase("es-MX");
+
+  return normalizeLyric(first) === normalizeLyric(second);
 }
 
 function getActiveLyricIndex(currentTime: number, lyrics: SyncedLyricLine[]) {
