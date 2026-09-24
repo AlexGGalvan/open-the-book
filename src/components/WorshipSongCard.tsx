@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Clock3,
@@ -12,6 +12,12 @@ import {
   SkipForward,
 } from "lucide-react";
 import { worshipSongs, type SyncedLyricLine, type WorshipSong } from "@/data/worshipSongs";
+
+const LYRICS_PER_PAGE = 6;
+
+type IndexedLyricLine = SyncedLyricLine & {
+  index: number;
+};
 
 export function WorshipSongCard() {
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
@@ -87,7 +93,6 @@ function WorshipLibrary({ onSelectSong }: { onSelectSong: (song: WorshipSong) =>
 
 function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const lyricRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(song.duration);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -98,17 +103,12 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
   const previousLine = activeLineIndex > 0 ? song.lyrics[activeLineIndex - 1] : null;
   const nextLine = song.lyrics[displayLineIndex + 1] ?? null;
   const progress = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
-
-  useEffect(() => {
-    if (activeLineIndex < 0) {
-      return;
-    }
-
-    lyricRefs.current[activeLineIndex]?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-  }, [activeLineIndex]);
+  const lyricPages = useMemo(() => createLyricPages(song.lyrics), [song.lyrics]);
+  const activePageIndex = Math.min(
+    Math.floor(displayLineIndex / LYRICS_PER_PAGE),
+    Math.max(lyricPages.length - 1, 0),
+  );
+  const activePage = lyricPages[activePageIndex] ?? [];
 
   async function togglePlayback() {
     const audio = audioRef.current;
@@ -158,10 +158,13 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
         </button>
 
         <div className="min-w-0 flex-1 text-center">
-          <p className="text-xs font-bold uppercase text-[#007cb3]">{song.subtitle}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#007cb3]">
+            Reproductor cristiano
+          </p>
+          <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
           <h2
             id="worship-song-title"
-            className="mt-1 truncate font-serif text-3xl font-semibold leading-none text-[#00589d] sm:text-4xl"
+            className="mt-3 truncate font-serif text-3xl font-semibold leading-none text-[#00589d] sm:text-4xl"
           >
             {song.title}
           </h2>
@@ -254,42 +257,191 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
         </div>
       </div>
 
-      <div aria-label="Letra sincronizada" className="mt-6 max-h-[430px] overflow-y-auto pr-1">
-        <div className="space-y-2">
-          {song.lyrics.map((line, index) => {
-            const isActive = index === activeLineIndex;
-            const hasPlayed = activeLineIndex >= index;
-
-            return (
-              <button
-                key={`${line.time}-${line.text}`}
-                ref={(element) => {
-                  lyricRefs.current[index] = element;
-                }}
-                aria-current={isActive ? "true" : undefined}
-                className={`w-full rounded-md border px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#36d9e6] ${
-                  isActive
-                    ? "border-[#00589d] bg-[#00589d] text-white shadow-[0_12px_24px_rgba(0,82,150,0.18)]"
-                    : hasPlayed
-                      ? "border-[#bdeff2] bg-[#e8fbfb] text-[#073a5a]"
-                      : "border-transparent bg-white/70 text-[#38667a] hover:border-[#bdeff2] hover:bg-white"
-                }`}
-                onClick={() => seekTo(line.time)}
-                type="button"
-              >
-                <span className="block text-[0.7rem] font-bold uppercase opacity-70">
-                  {formatTime(line.time)}
-                </span>
-                <span className="mt-1 block font-serif text-xl font-semibold leading-snug sm:text-2xl">
-                  {line.text}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <LyricBook
+        activeLineIndex={activeLineIndex}
+        currentTime={currentTime}
+        duration={duration}
+        onSeek={seekTo}
+        page={activePage}
+        pageIndex={activePageIndex}
+        pageTotal={lyricPages.length}
+        song={song}
+      />
     </section>
   );
+}
+
+function LyricBook({
+  activeLineIndex,
+  currentTime,
+  duration,
+  onSeek,
+  page,
+  pageIndex,
+  pageTotal,
+  song,
+}: {
+  activeLineIndex: number;
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+  page: IndexedLyricLine[];
+  pageIndex: number;
+  pageTotal: number;
+  song: WorshipSong;
+}) {
+  const midpoint = Math.ceil(page.length / 2);
+  const leftPage = page.slice(0, midpoint);
+  const rightPage = page.slice(midpoint);
+
+  return (
+    <div
+      aria-label="Letra sincronizada"
+      className="relative mt-6 overflow-hidden rounded-lg border border-[#bdeff2] bg-[#fffdf6] px-4 py-5 shadow-[0_18px_38px_rgba(0,82,150,0.13)] sm:px-5"
+    >
+      <div className="pointer-events-none absolute inset-y-4 left-1/2 hidden w-px bg-[#b7d9e7] sm:block" />
+      <div className="pointer-events-none absolute bottom-5 right-5 hidden h-24 w-24 rounded-full border border-[#bdeff2] opacity-30 sm:block" />
+
+      <div className="mb-4 grid gap-3 text-center sm:grid-cols-2">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#00589d]">
+            Letra
+          </p>
+          <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
+        </div>
+        <div className="hidden sm:block">
+          <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#00589d]">
+            Tu palabra es vida
+          </p>
+          <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
+        </div>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2 sm:gap-8">
+        <div className="space-y-2">
+          {leftPage.map((line) => (
+            <LyricBookLine
+              key={`${line.time}-${line.text}`}
+              activeLineIndex={activeLineIndex}
+              currentTime={currentTime}
+              duration={duration}
+              line={line}
+              onSeek={onSeek}
+              song={song}
+            />
+          ))}
+        </div>
+        <div className="space-y-2">
+          {rightPage.map((line) => (
+            <LyricBookLine
+              key={`${line.time}-${line.text}`}
+              activeLineIndex={activeLineIndex}
+              currentTime={currentTime}
+              duration={duration}
+              line={line}
+              onSeek={onSeek}
+              song={song}
+            />
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-4 text-center text-xs font-bold uppercase tracking-[0.24em] text-[#6a91a5]">
+        Página {pageIndex + 1} / {pageTotal}
+      </p>
+    </div>
+  );
+}
+
+function LyricBookLine({
+  activeLineIndex,
+  currentTime,
+  duration,
+  line,
+  onSeek,
+  song,
+}: {
+  activeLineIndex: number;
+  currentTime: number;
+  duration: number;
+  line: IndexedLyricLine;
+  onSeek: (time: number) => void;
+  song: WorshipSong;
+}) {
+  const isActive = line.index === activeLineIndex;
+  const hasPlayed = activeLineIndex >= line.index;
+  const underlineProgress = getLineUnderlineProgress(line.index, song.lyrics, currentTime, duration);
+
+  return (
+    <button
+      aria-current={isActive ? "true" : undefined}
+      className={`group flex w-full gap-3 rounded-md px-2 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#36d9e6] ${
+        isActive
+          ? "bg-[#e8fbfb] text-[#00589d]"
+          : hasPlayed
+            ? "text-[#073a5a]"
+            : "text-[#5f7d8b] hover:bg-[#effdfb]"
+      }`}
+      onClick={() => onSeek(line.time)}
+      type="button"
+    >
+      <span className="mt-1 w-7 shrink-0 text-right text-sm font-bold text-[#36a6c8]">
+        {line.index + 1}
+      </span>
+      <span className="min-w-0">
+        <span
+          className={`inline bg-no-repeat font-serif text-xl font-semibold leading-snug sm:text-2xl ${
+            isActive ? "text-[#00589d]" : ""
+          }`}
+          style={{
+            backgroundImage:
+              "linear-gradient(transparent 58%, rgba(54, 217, 230, 0.38) 58%)",
+            backgroundSize: `${underlineProgress}% 100%`,
+          }}
+        >
+          {line.text}
+        </span>
+        <span className="mt-1 block text-xs font-bold text-[#6a91a5]">
+          {formatTime(line.time)}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function createLyricPages(lyrics: SyncedLyricLine[]) {
+  const indexedLyrics = lyrics.map((line, index) => ({ ...line, index }));
+  const pages: IndexedLyricLine[][] = [];
+
+  for (let index = 0; index < indexedLyrics.length; index += LYRICS_PER_PAGE) {
+    pages.push(indexedLyrics.slice(index, index + LYRICS_PER_PAGE));
+  }
+
+  return pages;
+}
+
+function getLineUnderlineProgress(
+  lineIndex: number,
+  lyrics: SyncedLyricLine[],
+  currentTime: number,
+  duration: number,
+) {
+  const currentLine = lyrics[lineIndex];
+  const nextLine = lyrics[lineIndex + 1];
+
+  if (!currentLine || currentTime < currentLine.time) {
+    return 0;
+  }
+
+  const lineEnd = nextLine?.time ?? duration;
+
+  if (currentTime >= lineEnd) {
+    return 100;
+  }
+
+  const lineDuration = Math.max(lineEnd - currentLine.time, 0.1);
+
+  return Math.min(((currentTime - currentLine.time) / lineDuration) * 100, 100);
 }
 
 function getActiveLyricIndex(currentTime: number, lyrics: SyncedLyricLine[]) {
