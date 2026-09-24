@@ -6,6 +6,7 @@ export type SyncedLyricLine = {
 export type WorshipSong = {
   id: string;
   title: string;
+  subtitle: string;
   audioSrc: string;
   duration: number;
   lyrics: SyncedLyricLine[];
@@ -15,6 +16,7 @@ export const worshipSongs: WorshipSong[] = [
   {
     id: "de-gloria-en-gloria-te-veo",
     title: "De gloria en gloria te veo",
+    subtitle: "Alabanza congregacional",
     audioSrc: "/audio/de-gloria-en-gloria-te-veo.mp3",
     duration: 243.912,
     lyrics: [
