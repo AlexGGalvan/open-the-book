@@ -103,11 +103,11 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
   const previousLine = activeLineIndex > 0 ? song.lyrics[activeLineIndex - 1] : null;
   const nextLine = song.lyrics[displayLineIndex + 1] ?? null;
   const progress = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
-  const lyricPages = useMemo(() => createLyricPages(song.lyrics), [song.lyrics]);
-  const activePageIndex = Math.min(
-    Math.floor(displayLineIndex / LYRICS_PER_PAGE),
-    Math.max(lyricPages.length - 1, 0),
+  const lyricPages = useMemo(
+    () => createLyricPages(song.lyrics, song.lyricPageStarts),
+    [song.lyricPageStarts, song.lyrics],
   );
+  const activePageIndex = getActivePageIndex(displayLineIndex, lyricPages);
   const activePage = lyricPages[activePageIndex] ?? [];
 
   async function togglePlayback() {
@@ -409,15 +409,41 @@ function LyricBookLine({
   );
 }
 
-function createLyricPages(lyrics: SyncedLyricLine[]) {
+function createLyricPages(lyrics: SyncedLyricLine[], pageStarts?: number[]) {
   const indexedLyrics = lyrics.map((line, index) => ({ ...line, index }));
   const pages: IndexedLyricLine[][] = [];
+
+  if (pageStarts?.length) {
+    const starts = [...new Set(pageStarts)]
+      .filter((start) => start >= 0 && start < indexedLyrics.length)
+      .sort((first, second) => first - second);
+
+    if (starts[0] !== 0) {
+      starts.unshift(0);
+    }
+
+    for (let index = 0; index < starts.length; index += 1) {
+      const start = starts[index];
+      const end = starts[index + 1] ?? indexedLyrics.length;
+      pages.push(indexedLyrics.slice(start, end));
+    }
+
+    return pages;
+  }
 
   for (let index = 0; index < indexedLyrics.length; index += LYRICS_PER_PAGE) {
     pages.push(indexedLyrics.slice(index, index + LYRICS_PER_PAGE));
   }
 
   return pages;
+}
+
+function getActivePageIndex(lineIndex: number, lyricPages: IndexedLyricLine[][]) {
+  const pageIndex = lyricPages.findIndex((page) =>
+    page.some((line) => line.index === lineIndex),
+  );
+
+  return pageIndex >= 0 ? pageIndex : 0;
 }
 
 function getLineUnderlineProgress(
