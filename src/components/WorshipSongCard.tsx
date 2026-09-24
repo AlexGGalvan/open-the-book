@@ -161,13 +161,9 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
         </button>
 
         <div className="min-w-0 flex-1 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#007cb3]">
-            Reproductor cristiano
-          </p>
-          <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
           <h2
             id="worship-song-title"
-            className="mt-3 truncate font-serif text-3xl font-semibold leading-none text-[#00589d] sm:text-4xl"
+            className="truncate font-serif text-3xl font-semibold leading-none text-[#00589d] sm:text-4xl"
           >
             {song.title}
           </h2>
