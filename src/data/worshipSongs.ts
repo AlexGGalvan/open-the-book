@@ -23,7 +23,7 @@ export const worshipSongs: WorshipSong[] = [
       { time: 8, text: "De gloria en gloria, Te veo" },
       { time: 15, text: "Cuanto más Te conozco" },
       { time: 22, text: "Quiero saber más de Ti" },
-      { time: 30.5, text: "Mi Dios, cuán buen alfarero" },
+      { time: 27, text: "Mi Dios, cuán buen alfarero" },
       { time: 38, text: "Quebrántame, transfórmame" },
       { time: 46, text: "Moldéame a Tu imagen, Señor" },
       { time: 54.5, text: "Quiero ser más como Tú, Señor" },
