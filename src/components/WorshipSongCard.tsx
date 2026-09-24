@@ -259,13 +259,10 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
 
       <LyricBook
         activeLineIndex={activeLineIndex}
-        currentTime={currentTime}
-        duration={duration}
         onSeek={seekTo}
         page={activePage}
         pageIndex={activePageIndex}
         pageTotal={lyricPages.length}
-        song={song}
       />
     </section>
   );
@@ -273,22 +270,16 @@ function WorshipPlayer({ song, onBack }: { song: WorshipSong; onBack: () => void
 
 function LyricBook({
   activeLineIndex,
-  currentTime,
-  duration,
   onSeek,
   page,
   pageIndex,
   pageTotal,
-  song,
 }: {
   activeLineIndex: number;
-  currentTime: number;
-  duration: number;
   onSeek: (time: number) => void;
   page: IndexedLyricLine[];
   pageIndex: number;
   pageTotal: number;
-  song: WorshipSong;
 }) {
   const midpoint = Math.ceil(page.length / 2);
   const leftPage = page.slice(0, midpoint);
@@ -297,95 +288,94 @@ function LyricBook({
   return (
     <div
       aria-label="Letra sincronizada"
-      className="relative mt-6 overflow-hidden rounded-lg border border-[#bdeff2] bg-[#fffdf6] px-4 py-5 shadow-[0_18px_38px_rgba(0,82,150,0.13)] sm:px-5"
+      className="relative mt-7 rounded-lg bg-[#00589d] px-3 pb-4 pt-3 shadow-[0_24px_52px_rgba(0,82,150,0.22)] sm:px-5 sm:pb-6 sm:pt-5"
     >
-      <div className="pointer-events-none absolute inset-y-4 left-1/2 hidden w-px bg-[#b7d9e7] sm:block" />
-      <div className="pointer-events-none absolute bottom-5 right-5 hidden h-24 w-24 rounded-full border border-[#bdeff2] opacity-30 sm:block" />
+      <div className="pointer-events-none absolute inset-x-8 bottom-1 h-4 rounded-b-lg bg-[#003e73] opacity-50" />
+      <div className="relative overflow-hidden rounded-lg border border-[#bdeff2] bg-[#fffdf6] px-4 py-5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.78),0_16px_30px_rgba(0,33,61,0.2)] sm:px-6 sm:py-6">
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-[#d4eef5] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-3 bg-gradient-to-l from-[#d4eef5] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-5 left-1/2 hidden w-px bg-[#b7d9e7] shadow-[0_0_20px_rgba(0,88,157,0.22)] sm:block" />
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-10 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#d7ecf3] to-transparent opacity-70 sm:block" />
+        <div className="pointer-events-none absolute bottom-4 left-1/2 hidden h-20 w-7 -translate-x-1/2 rounded-t-full bg-[#00589d] shadow-[0_8px_14px_rgba(0,82,150,0.2)] sm:block" />
+        <div className="pointer-events-none absolute bottom-5 right-6 hidden h-24 w-24 rounded-full border border-[#bdeff2] opacity-25 sm:block" />
+        <div className="pointer-events-none absolute left-7 right-7 top-0 h-2 rounded-b-full bg-white/80 shadow-[0_8px_18px_rgba(0,82,150,0.1)]" />
 
-      <div className="mb-4 grid gap-3 text-center sm:grid-cols-2">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#00589d]">
-            Letra
-          </p>
-          <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
+        <div className="mb-5 grid gap-3 text-center sm:grid-cols-2">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#00589d]">
+              Letra
+            </p>
+            <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
+          </div>
+          <div className="hidden sm:block">
+            <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#00589d]">
+              Tu palabra es vida
+            </p>
+            <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
+          </div>
         </div>
-        <div className="hidden sm:block">
-          <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#00589d]">
-            Tu palabra es vida
-          </p>
-          <div className="mx-auto mt-2 h-0.5 w-12 bg-[#36d9e6]" />
+
+        <div className="grid gap-2 sm:grid-cols-2 sm:gap-10">
+          <div className="space-y-2 sm:pr-2">
+            {leftPage.map((line) => (
+              <LyricBookLine
+                key={`${line.time}-${line.text}`}
+                activeLineIndex={activeLineIndex}
+                line={line}
+                onSeek={onSeek}
+              />
+            ))}
+          </div>
+          <div className="space-y-2 sm:pl-2">
+            {rightPage.map((line) => (
+              <LyricBookLine
+                key={`${line.time}-${line.text}`}
+                activeLineIndex={activeLineIndex}
+                line={line}
+                onSeek={onSeek}
+              />
+            ))}
+          </div>
         </div>
+
+        <p className="mt-5 pr-3 text-right text-xs font-bold uppercase tracking-[0.24em] text-[#6a91a5]">
+          Página {pageIndex + 1} / {pageTotal}
+        </p>
       </div>
-
-      <div className="grid gap-2 sm:grid-cols-2 sm:gap-8">
-        <div className="space-y-2">
-          {leftPage.map((line) => (
-            <LyricBookLine
-              key={`${line.time}-${line.text}`}
-              activeLineIndex={activeLineIndex}
-              currentTime={currentTime}
-              duration={duration}
-              line={line}
-              onSeek={onSeek}
-              song={song}
-            />
-          ))}
-        </div>
-        <div className="space-y-2">
-          {rightPage.map((line) => (
-            <LyricBookLine
-              key={`${line.time}-${line.text}`}
-              activeLineIndex={activeLineIndex}
-              currentTime={currentTime}
-              duration={duration}
-              line={line}
-              onSeek={onSeek}
-              song={song}
-            />
-          ))}
-        </div>
-      </div>
-
-      <p className="mt-4 text-center text-xs font-bold uppercase tracking-[0.24em] text-[#6a91a5]">
-        Página {pageIndex + 1} / {pageTotal}
-      </p>
     </div>
   );
 }
 
 function LyricBookLine({
   activeLineIndex,
-  currentTime,
-  duration,
   line,
   onSeek,
-  song,
 }: {
   activeLineIndex: number;
-  currentTime: number;
-  duration: number;
   line: IndexedLyricLine;
   onSeek: (time: number) => void;
-  song: WorshipSong;
 }) {
   const isActive = line.index === activeLineIndex;
   const hasPlayed = activeLineIndex >= line.index;
-  const underlineProgress = getLineUnderlineProgress(line.index, song.lyrics, currentTime, duration);
 
   return (
     <button
       aria-current={isActive ? "true" : undefined}
-      className={`group flex w-full gap-3 rounded-md px-2 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#36d9e6] ${
+      className={`group flex w-full gap-3 rounded-md px-2 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[#36d9e6] ${
         isActive
-          ? "bg-[#e8fbfb] text-[#00589d]"
+          ? "bg-[#e8fbfb] text-[#00589d] shadow-[inset_3px_0_0_#36d9e6]"
           : hasPlayed
-            ? "text-[#073a5a]"
-            : "text-[#5f7d8b] hover:bg-[#effdfb]"
+            ? "text-[#0d4d70]"
+            : "text-[#5f7d8b] hover:bg-[#f7fffd]"
       }`}
       onClick={() => onSeek(line.time)}
       type="button"
     >
-      <span className="mt-1 w-7 shrink-0 text-right text-sm font-bold text-[#36a6c8]">
+      <span
+        className={`mt-1 grid size-7 shrink-0 place-items-center rounded-full text-sm font-bold ${
+          isActive ? "bg-[#00589d] text-white" : "text-[#36a6c8]"
+        }`}
+      >
         {line.index + 1}
       </span>
       <span className="min-w-0">
@@ -394,9 +384,12 @@ function LyricBookLine({
             isActive ? "text-[#00589d]" : ""
           }`}
           style={{
-            backgroundImage:
-              "linear-gradient(transparent 58%, rgba(54, 217, 230, 0.38) 58%)",
-            backgroundSize: `${underlineProgress}% 100%`,
+            textDecorationLine: hasPlayed ? "underline" : "none",
+            textDecorationColor: isActive
+              ? "rgba(54, 217, 230, 0.82)"
+              : "rgba(54, 217, 230, 0.46)",
+            textDecorationThickness: isActive ? "0.16em" : "0.1em",
+            textUnderlineOffset: "0.1em",
           }}
         >
           {line.text}
@@ -444,30 +437,6 @@ function getActivePageIndex(lineIndex: number, lyricPages: IndexedLyricLine[][])
   );
 
   return pageIndex >= 0 ? pageIndex : 0;
-}
-
-function getLineUnderlineProgress(
-  lineIndex: number,
-  lyrics: SyncedLyricLine[],
-  currentTime: number,
-  duration: number,
-) {
-  const currentLine = lyrics[lineIndex];
-  const nextLine = lyrics[lineIndex + 1];
-
-  if (!currentLine || currentTime < currentLine.time) {
-    return 0;
-  }
-
-  const lineEnd = nextLine?.time ?? duration;
-
-  if (currentTime >= lineEnd) {
-    return 100;
-  }
-
-  const lineDuration = Math.max(lineEnd - currentLine.time, 0.1);
-
-  return Math.min(((currentTime - currentLine.time) / lineDuration) * 100, 100);
 }
 
 function getActiveLyricIndex(currentTime: number, lyrics: SyncedLyricLine[]) {
