@@ -19,8 +19,8 @@ const recitations: RecitationItem[] = [
     id: "current",
     label: "Esta semana",
     passage: {
-      reference: "Romanos 14:11-12",
-      text: "Porque escrito está: Vivo yo, dice el Señor, que ante mí se doblará toda rodilla, y toda lengua confesará a Dios. De manera que cada uno de nosotros dará a Dios cuenta de sí.",
+      reference: "Hechos 7:59-60",
+      text: "Y apedreaban a Esteban, mientras él invocaba y decía: Señor Jesús, recibe mi espíritu. Y puesto de rodillas, clamó a gran voz: Señor, no les tomes en cuenta este pecado. Y habiendo dicho esto, durmió.",
       translation: "Reina-Valera 1960",
     },
   },
@@ -28,8 +28,8 @@ const recitations: RecitationItem[] = [
     id: "next",
     label: "Próxima semana",
     passage: {
-      reference: "Hechos 7:59-60",
-      text: "Y apedreaban a Esteban, mientras él invocaba y decía: Señor Jesús, recibe mi espíritu. Y puesto de rodillas, clamó a gran voz: Señor, no les tomes en cuenta este pecado. Y habiendo dicho esto, durmió.",
+      reference: "Hebreos 4:13",
+      text: "Y no hay cosa creada que no sea manifiesta en su presencia; antes bien todas las cosas están desnudas y abiertas a los ojos de aquel a quien tenemos que dar cuenta.",
       translation: "Reina-Valera 1960",
     },
   },
