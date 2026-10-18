@@ -19,8 +19,8 @@ const recitations: RecitationItem[] = [
     id: "current",
     label: "Esta semana",
     passage: {
-      reference: "Hebreos 4:13",
-      text: "Y no hay cosa creada que no sea manifiesta en su presencia; antes bien todas las cosas están desnudas y abiertas a los ojos de aquel a quien tenemos que dar cuenta.",
+      reference: "San Mateo 10:28",
+      text: "Y no temáis a los que matan el cuerpo, mas el alma no pueden matar; temed más bien a aquel que puede destruir el alma y el cuerpo en el infierno.",
       translation: "Reina-Valera 1960",
     },
   },
@@ -28,8 +28,8 @@ const recitations: RecitationItem[] = [
     id: "next",
     label: "Próxima semana",
     passage: {
-      reference: "San Mateo 10:28",
-      text: "Y no temáis a los que matan el cuerpo, mas el alma no pueden matar; temed más bien a aquel que puede destruir el alma y el cuerpo en el infierno.",
+      reference: "Hebreos 9:27-28",
+      text: "Y de la manera que está establecido para los hombres que mueran una sola vez, y después de esto el juicio, así también Cristo fue ofrecido una sola vez para llevar los pecados de muchos; y aparecerá por segunda vez, sin relación con el pecado, para salvar a los que le esperan.",
       translation: "Reina-Valera 1960",
     },
   },
