@@ -1,5 +1,5 @@
-import { DailyMannaApp } from "@/components/DailyMannaApp";
+import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
 
 export default function Home() {
-  return <DailyMannaApp />;
+  return <CalendarDashboard />;
 }

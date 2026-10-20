@@ -1,8 +1,28 @@
-# Daily Manna
+# Iglesia de Torreón - Lectura diaria
 
-Aplicación cristiana mobile-first con una palabra diaria y un pasaje semanal de memorización.
+Aplicación web pública para organizar el plan mensual de lectura bíblica, las reflexiones compartidas por los hermanos, el historial de participantes, materiales de apoyo y la recitación semanal.
 
-## Correr el proyecto
+La primera fase funciona con datos de ejemplo y exportación estática para GitHub Pages. El esquema de Supabase y el importador privado de WhatsApp quedan listos para la siguiente fase, sin conectar todavía una fuente de datos en vivo.
+
+## Tecnología
+
+- Next.js 16 con App Router
+- TypeScript
+- Tailwind CSS 4
+- Supabase/PostgreSQL (esquema preparado)
+- Pruebas con `node:test` mediante `tsx`
+
+## Secciones públicas
+
+- `/`: calendario mensual, lectura seleccionada y reflexiones del día.
+- `/reflexiones`: búsqueda por texto, participante, libro o referencia.
+- `/participantes`: resumen de participaciones e historial individual.
+- `/recursos`: materiales del plan y descargas de ejemplo.
+- `/recitacion`: recitación de esta semana y la próxima, con práctica de memoria.
+
+No existe inicio de sesión, formulario público de carga ni sistema de notificaciones. Todos los visitantes ven la misma información autorizada.
+
+## Desarrollo local
 
 ```bash
 npm install
@@ -14,125 +34,88 @@ Abre `http://127.0.0.1:3000`.
 ## Validación
 
 ```bash
+npm test
 npm run lint
 npm run typecheck
 npm run build
 ```
 
-Para validar el export estático usado por GitHub Pages:
+Para reproducir la exportación estática usada por GitHub Pages en PowerShell:
 
-```bash
+```powershell
 $env:GITHUB_PAGES = "true"
 npm run build
 ```
 
-En macOS/Linux:
-
-```bash
-GITHUB_PAGES=true npm run build
-```
-
-## Today's Manna
-
-Los datos demo viven en `src/data/manna.json`.
-
-Cada registro puede usar:
-
-```ts
-type Manna = {
-  id: string;
-  date?: string;
-  reference: string;
-  text: string;
-  title?: string;
-  reflection?: string;
-  translation?: string;
-  isDemo?: boolean;
-};
-```
-
-`src/services/mannaProvider.ts` contiene `getMannaForDate(date)` como fallback local y `getBibleHabitMannaForDate(date)` como provider remoto.
-
-El provider remoto consulta:
+## Organización
 
 ```text
-https://api--bible-habit-server--26zn8kx8mjzy.code.run/api/daily-manna/today
+src/
+  app/                         Rutas públicas
+  components/                  Componentes por funcionalidad
+  data/churchData.ts           Datos de demostración
+  domain/church.ts             Tipos del dominio
+  server/supabase/admin.ts     Cliente privado de Supabase
+  server/whatsapp-import/      Parser y normalizador de WhatsApp
+supabase/schema.sql            Tablas, índices y políticas RLS
+scripts/import-whatsapp.ts     Entrada de línea de comandos privada
 ```
 
-El APK confirma esta ruta dentro del módulo `everyday_manna`. La respuesta actual de Bible Habit trae la referencia diaria y textos desde `source: jbch`; si el texto llega en coreano, la web busca un override permitido en `src/data/rvr1960Passages.ts`. Si no existe override, solo usa la referencia y deja el texto pendiente hasta conectar una traducción bíblica autorizada.
+## Supabase
 
-RVR1960 tiene copyright. No se usa como una Biblia completa local; solo se incluyen citas puntuales con aviso de derechos.
+1. Crea un proyecto en Supabase.
+2. Ejecuta `supabase/schema.sql` en el editor SQL.
+3. Define las variables de `.env.example` únicamente en un entorno privado:
 
-Si existe un registro local con la fecha exacta, `getMannaForDate` lo usa. Si no existe, rota los datos demo de forma diaria desde `MANNA_CONFIG.anchorDate`.
-
-Cuando exista una fuente real, cambia el provider para leer desde JSON completo, API, base de datos o contenido extraído de Bible Habit sin tocar los componentes visuales.
-
-## Weekly Memorization
-
-Las referencias cargadas viven en `src/data/memorizationVerses.json`. Actualmente solo incluye:
-
-- el punto de calibración confirmado: `Eclesiastés 11:9`;
-- las referencias de ejemplo proporcionadas para `Segunda venida`;
-- las referencias de ejemplo proporcionadas para `Obediencia`.
-
-No se agregaron referencias inventadas para completar las 244.
-
-La configuración semanal está en `src/config/memorization.ts`:
-
-```ts
-export const MEMORIZATION_CONFIG = {
-  anchorDate: "2026-08-31",
-  anchorReference: "Eclesiastés 11:9",
-  weekStartsOn: 1,
-  timezone: "America/Monterrey",
-  expectedTotalReferences: 244,
-  showWeekCounter: false,
-} as const;
+```text
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
-La semana del 31 de agosto de 2026 al 6 de septiembre de 2026 queda sincronizada con `Eclesiastés 11:9`.
+La llave de servicio nunca debe llevar el prefijo `NEXT_PUBLIC_`, incluirse en el bundle del navegador ni guardarse en Git. El cliente de `src/server/supabase/admin.ts` importa `server-only` para impedir su uso accidental desde componentes públicos.
 
-## Algoritmo provisional
+Las políticas RLS permiten leer únicamente:
 
-Todavía no conocemos con certeza el algoritmo interno de Bible Habit. Sabemos que en el APK existen nombres como `MemorizationVerseRef`, `getVerseRefForWeekOffset()`, `memorization_start_offset`, `memorization_change_order`, `memorization_reset_order` y `memorization_topic`, pero no se debe asumir su comportamiento.
+- participantes activos;
+- calendario y lecturas;
+- reflexiones con estado `authorized`;
+- recursos con `is_published = true`.
 
-La implementación actual usa:
+Las tablas de importación no tienen políticas ni permisos públicos. La aprobación y publicación deben realizarse con procesos privados de administración.
 
-1. buscar `anchorReference` dentro de `memorizationVerses`;
-2. calcular semanas transcurridas desde `anchorDate`;
-3. aplicar módulo matemático seguro para soportar fechas anteriores;
-4. devolver el elemento correspondiente.
+## Importación de WhatsApp
 
-Cuando tengamos las 244 referencias en el orden correcto, coloca la lista completa en `src/data/memorizationVerses.json`. El cálculo usará automáticamente el índice de `Eclesiastés 11:9` como `anchorIndex`.
+El procesador admite formatos comunes de exportación de Android y iPhone, incluyendo mensajes de varias líneas. Para inspeccionar un TXT sin publicar nada:
 
-## Cambiar la fecha base
+```bash
+npm run import:whatsapp -- "C:\ruta\exportacion.txt"
+```
 
-Edita `anchorDate` en `src/config/memorization.ts`. Debe representar el inicio de la semana de calibración según `weekStartsOn`.
+La salida muestra únicamente un resumen y metadatos de revisión. No imprime el texto bíblico, la reflexión completa ni el contenido descartado.
 
-## Cambiar la zona horaria
+El módulo:
 
-Edita `timezone` en `src/config/memorization.ts`. El valor actual es `America/Monterrey`, pensado para Coahuila, México.
+- extrae autor, fecha, hora y contenido;
+- reconoce nombres y abreviaturas de los 66 libros;
+- normaliza citas como `Lam 2:21` y `EFESIOS 4:11-12`;
+- separa texto bíblico y reflexión mediante etiquetas o párrafos;
+- conserva el texto bíblico tal como fue compartido;
+- valida libro y capítulo contra el plan de lectura;
+- asigna al día anterior mensajes enviados antes de las 03:00 cuando la cita coincide;
+- deduplica mediante SHA-256;
+- oculta autores que sean números telefónicos;
+- guarda por separado `sentAt` y `readingDate`;
+- marca casos ambiguos y deja `published: false`;
+- descarta conversaciones sin referencia sin conservar su contenido en el resultado.
 
-## Cambiar la traducción bíblica
+Los archivos TXT se procesan únicamente desde el entorno privado. No existe una pantalla pública de importación.
 
-La referencia y el texto están separados. Los textos actuales que existen en JSON están marcados con `translation`.
+## Recitación semanal
 
-Para integrar traducciones en el futuro:
-
-1. agrega el texto autorizado dentro del JSON; o
-2. reemplaza `getBibleText(reference, translation)` en `src/services/memorizationProvider.ts` por una consulta a una API bíblica licenciada; o
-3. crea un servicio dedicado, por ejemplo `src/services/bibleTextProvider.ts`.
-
-No agregues una traducción completa sin confirmar licencia y permiso de uso.
-
-## Cache y PWA
-
-La app ya no registra un service worker ni guarda el estado actual en `localStorage`. Al abrirse, borra las claves antiguas del sitio y desregistra cualquier service worker previo para evitar que el celular conserve versiones viejas.
-
-`public/sw.js` se conserva solo como limpiador de transición para usuarios que ya tenían una versión cacheada instalada.
-
-Las llamadas a Bible Habit agregan un parámetro temporal de cache-bust para que un service worker antiguo no reutilice respuestas viejas de `daily-manna/today`.
+La recitación existente se conserva en `src/components/WeeklyRecitationCard.tsx`. Para actualizarla, cambia únicamente el arreglo `recitations`; la navegación principal la expone en `/recitacion`.
 
 ## GitHub Pages
 
-El workflow `.github/workflows/deploy-pages.yml` exporta el sitio con Next.js y lo publica en GitHub Pages cuando se hace push a `main` o `master`.
+El workflow `.github/workflows/deploy-pages.yml` ejecuta el build estático y publica el contenido de `out/` después de cada push a `main` o `master`.
+
+La conexión de lectura en vivo con Supabase requerirá migrar el hosting a un entorno con servidor Next.js o consumir una API pública con acceso de solo lectura. La fase actual no expone credenciales para conservar la seguridad del proyecto.

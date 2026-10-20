@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import type { ReactNode } from "react";
+import { ChurchAppShell } from "@/components/church/ChurchAppShell";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,26 +21,26 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL("https://alexggalvan.github.io/open-the-book/"),
   title: {
-    default: "Recitación de la semana",
-    template: "%s | Recitación de la semana",
+    default: "Iglesia de Torreón | Lectura diaria",
+    template: "%s | Iglesia de Torreón",
   },
-  description: "Memorizaciones bíblicas semanales para recitar y practicar.",
-  applicationName: "Recitación de la semana",
+  description: "Lecturas bíblicas diarias, reflexiones y recursos de la Iglesia de Torreón.",
+  applicationName: "Iglesia de Torreón - Lectura diaria",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Recitación",
+    title: "Lectura diaria",
   },
   openGraph: {
-    title: "Recitación de la semana",
-    description: "Memorizaciones bíblicas semanales para recitar y practicar.",
+    title: "Iglesia de Torreón | Lectura diaria",
+    description: "Lecturas bíblicas diarias, reflexiones y recursos de la Iglesia de Torreón.",
     type: "website",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#eafffb",
+  themeColor: "#1677c8",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -51,7 +52,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       lang="es"
       className={`${inter.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#eafffb] font-sans">{children}</body>
+      <body className="min-h-full bg-[#edf6fc] font-sans">
+        <ChurchAppShell>{children}</ChurchAppShell>
+      </body>
     </html>
   );
 }

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #eafffb;
-  --foreground: #073a5a;
+  --background: #edf6fc;
+  --foreground: #143965;
 }
 
 @theme inline {
@@ -12,7 +12,17 @@
   --font-serif: var(--font-cormorant);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+  scroll-padding-top: 24px;
+}
+
 body {
+  min-width: 320px;
   background: var(--background);
   color: var(--foreground);
 }
@@ -24,22 +34,16 @@ input {
   font: inherit;
 }
 
-::selection {
-  background: rgba(26, 183, 219, 0.28);
-  color: #073a5a;
+button,
+a,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
 }
 
-.recitation-texture {
-  background-image:
-    linear-gradient(132deg, rgba(91, 232, 222, 0.58), rgba(255, 255, 255, 0.92) 48%, rgba(239, 246, 241, 0.92)),
-    linear-gradient(24deg, rgba(0, 83, 151, 0.12), transparent 38%),
-    linear-gradient(90deg, rgba(0, 174, 219, 0.08) 1px, transparent 1px),
-    linear-gradient(rgba(0, 91, 161, 0.06) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    100% 100%,
-    34px 34px,
-    34px 34px;
+::selection {
+  background: rgba(22, 119, 200, 0.2);
+  color: #092f63;
 }
 
 @media (prefers-reduced-motion: reduce) {

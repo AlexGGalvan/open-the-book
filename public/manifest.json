@@ -1,12 +1,12 @@
 {
-  "name": "Recitación de la semana",
-  "short_name": "Recitación",
-  "description": "Memorizaciones bíblicas semanales para recitar y practicar.",
+  "name": "Iglesia de Torreón - Lectura diaria",
+  "short_name": "Lectura diaria",
+  "description": "Lecturas bíblicas, reflexiones y recursos de la Iglesia de Torreón.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eafffb",
-  "theme_color": "#1ab7db",
+  "background_color": "#edf6fc",
+  "theme_color": "#1677c8",
   "orientation": "portrait",
   "icons": [
     {
