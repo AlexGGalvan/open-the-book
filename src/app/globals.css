@@ -46,6 +46,153 @@ select {
   color: #092f63;
 }
 
+/* Keep the full dashboard visible on wide desktop displays with limited height. */
+@media (min-width: 1536px) and (max-height: 1130px) {
+  :root {
+    --compact-desktop-header-height: clamp(190px, 17.6vh, 202px);
+  }
+
+  .church-header-hero {
+    height: var(--compact-desktop-header-height);
+  }
+
+  .church-shell-grid {
+    min-height: calc(100dvh - var(--compact-desktop-header-height) - 1px);
+  }
+
+  .church-main {
+    padding: clamp(14px, 1.5vh, 20px) 24px;
+  }
+
+  .church-sidebar {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .church-sidebar-nav {
+    top: 14px;
+    gap: 6px;
+  }
+
+  .church-sidebar-link {
+    min-height: 56px;
+  }
+
+  .calendar-dashboard {
+    gap: 16px;
+  }
+
+  .calendar-panel {
+    padding: clamp(16px, 1.8vh, 21px);
+  }
+
+  .calendar-toolbar {
+    margin-bottom: 12px;
+  }
+
+  .calendar-month-title {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+
+  .calendar-icon-button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .calendar-weekday {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .calendar-day-cell {
+    min-height: clamp(92px, 9.5vh, 108px);
+    padding: 6px 8px;
+  }
+
+  .calendar-day-number {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .calendar-day-reading {
+    margin-top: 2px;
+    font-size: 0.8rem;
+    line-height: 1.15rem;
+  }
+
+  .calendar-day-reading > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1px;
+  }
+
+  .calendar-quote {
+    margin-top: 10px;
+    gap: 12px;
+    padding: 9px 16px;
+    font-size: 0.9rem;
+  }
+
+  .calendar-quote footer {
+    margin-top: 0;
+  }
+
+  .calendar-detail-title {
+    font-size: 1.65rem;
+    line-height: 1.2;
+  }
+
+  .calendar-readings {
+    margin-top: 17px;
+  }
+
+  .calendar-reading-box {
+    margin-top: 8px;
+    padding: 9px 16px;
+  }
+
+  .calendar-reading-box p {
+    font-size: 1.05rem;
+    line-height: 1.5rem;
+  }
+
+  .calendar-reflections {
+    margin-top: 13px;
+    padding-top: 13px;
+  }
+
+  .calendar-reflection-list {
+    margin-top: 8px;
+  }
+
+  .calendar-reflection-list > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 6px;
+  }
+
+  .reflection-card--compact {
+    padding: 8px 10px;
+  }
+
+  .reflection-card--compact > div {
+    gap: 9px;
+  }
+
+  .reflection-card--compact .reflection-card-name,
+  .reflection-card--compact .reflection-card-reference,
+  .reflection-card--compact .reflection-card-text {
+    font-size: 0.8rem;
+    line-height: 1.05rem;
+  }
+
+  .reflection-card--compact time {
+    font-size: 0.68rem;
+  }
+
+  .calendar-reflections-link {
+    min-height: 38px;
+    margin-top: 9px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

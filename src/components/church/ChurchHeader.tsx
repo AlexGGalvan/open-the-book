@@ -5,7 +5,7 @@ export function ChurchHeader() {
 
   return (
     <header className="border-b border-[#d6e8f6] bg-white" aria-label="Iglesia de Torreón">
-      <div className="relative hidden h-[clamp(152px,10.52vw,202px)] overflow-hidden md:block">
+      <div className="church-header-hero relative hidden h-[clamp(152px,10.52vw,202px)] overflow-hidden md:block">
         <Image
           alt="Iglesia de Torreón, Lectura diaria. La palabra tiene poder para sobreedificarnos y daros herencia con todos los santificados. Hechos 20:32."
           className="object-cover object-top"

@@ -37,8 +37,8 @@ export function AppSidebar() {
 
   return (
     <>
-      <aside className="hidden border-r border-[#dbeaf6] bg-[#f7fbff] px-3 py-7 lg:block">
-        <nav aria-label="Secciones principales" className="sticky top-7 space-y-3">
+      <aside className="church-sidebar hidden border-r border-[#dbeaf6] bg-[#f7fbff] px-3 py-7 lg:block">
+        <nav aria-label="Secciones principales" className="church-sidebar-nav sticky top-7 space-y-3">
           {navigationItems.map((item) => (
             <NavigationLink item={item} pathname={pathname} key={item.href} />
           ))}
@@ -79,7 +79,7 @@ function NavigationLink({ item, pathname }: { item: NavigationItem; pathname: st
   return (
     <Link
       aria-current={selected ? "page" : undefined}
-      className={`flex min-h-16 items-center gap-4 rounded-md px-5 text-lg transition focus:outline-none focus:ring-2 focus:ring-[#38a7e5] ${
+      className={`church-sidebar-link flex min-h-16 items-center gap-4 rounded-md px-5 text-lg transition focus:outline-none focus:ring-2 focus:ring-[#38a7e5] ${
         selected
           ? "bg-[#1978ca] font-bold text-white shadow-[0_10px_24px_rgba(25,120,202,0.22)]"
           : "font-medium text-[#2d4f78] hover:bg-[#e8f4fd] hover:text-[#0b65b5]"

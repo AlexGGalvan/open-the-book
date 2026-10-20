@@ -53,11 +53,11 @@ export function CalendarDashboard() {
   }
 
   return (
-    <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(390px,0.95fr)]">
-      <section className="min-w-0 rounded-lg border border-[#dbe9f4] bg-white p-4 sm:p-6" aria-labelledby="calendar-title">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div className="calendar-dashboard grid gap-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(390px,0.95fr)]">
+      <section className="calendar-panel calendar-panel--month min-w-0 rounded-lg border border-[#dbe9f4] bg-white p-4 sm:p-6" aria-labelledby="calendar-title">
+        <div className="calendar-toolbar mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <h1 id="calendar-title" className="text-3xl font-bold text-[#092f63] sm:text-4xl">
+            <h1 id="calendar-title" className="calendar-month-title text-3xl font-bold text-[#092f63] sm:text-4xl">
               {monthNames[visibleMonth.month]} {visibleMonth.year}
             </h1>
             <MonthButton label="Mes anterior" onClick={() => changeMonth(-1)}>
@@ -81,7 +81,7 @@ export function CalendarDashboard() {
             <div className="grid grid-cols-7 bg-[#eaf5fc]" role="row">
               {weekdays.map((day) => (
                 <div
-                  className="border-r border-[#cddfed] px-2 py-3 text-center text-xs font-bold uppercase text-[#1768ad] last:border-r-0"
+                  className="calendar-weekday border-r border-[#cddfed] px-2 py-3 text-center text-xs font-bold uppercase text-[#1768ad] last:border-r-0"
                   key={day}
                   role="columnheader"
                 >
@@ -93,7 +93,7 @@ export function CalendarDashboard() {
             <div className="grid grid-cols-7" role="rowgroup">
               {calendarCells.map((day, index) => {
                 if (day === null) {
-                  return <div aria-hidden="true" className="min-h-28 border-r border-t border-[#d8e6f1] bg-[#fbfdff]" key={`empty-${index}`} />;
+                  return <div aria-hidden="true" className="calendar-day-cell min-h-28 border-r border-t border-[#d8e6f1] bg-[#fbfdff]" key={`empty-${index}`} />;
                 }
 
                 const date = toIsoDate(visibleMonth.year, visibleMonth.month, day);
@@ -104,7 +104,7 @@ export function CalendarDashboard() {
                   <button
                     aria-label={`${day} de ${monthNames[visibleMonth.month]}`}
                     aria-selected={selected}
-                    className={`min-h-28 border-r border-t border-[#d8e6f1] p-2 text-left transition focus:z-10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#168ce1] ${
+                    className={`calendar-day-cell min-h-28 border-r border-t border-[#d8e6f1] p-2 text-left transition focus:z-10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#168ce1] ${
                       selected ? "bg-[#dff1fd] shadow-[inset_0_0_0_2px_#168ce1]" : "bg-white hover:bg-[#f2f9fe]"
                     }`}
                     key={date}
@@ -112,9 +112,9 @@ export function CalendarDashboard() {
                     role="gridcell"
                     type="button"
                   >
-                    <span className={`text-lg font-bold ${selected ? "text-[#0871c7]" : "text-[#163962]"}`}>{day}</span>
+                    <span className={`calendar-day-number text-lg font-bold ${selected ? "text-[#0871c7]" : "text-[#163962]"}`}>{day}</span>
                     {reading ? (
-                      <span className="mt-1 block space-y-1 text-sm text-[#315783]">
+                      <span className="calendar-day-reading mt-1 block space-y-1 text-sm text-[#315783]">
                         {reading.passages.map((passage) => (
                           <span className="block truncate" key={passage.reference} title={passage.reference}>
                             {abbreviateReference(passage.reference)}
@@ -135,7 +135,7 @@ export function CalendarDashboard() {
           </div>
         </div>
 
-        <blockquote className="mt-4 flex items-center gap-4 rounded-lg bg-[#e6f4fd] px-5 py-4 text-[#1c68aa]">
+        <blockquote className="calendar-quote mt-4 flex items-center gap-4 rounded-lg bg-[#e6f4fd] px-5 py-4 text-[#1c68aa]">
           <BookOpen aria-hidden="true" className="shrink-0" size={31} strokeWidth={1.8} />
           <div>
             <p>La palabra tiene poder para sobreedificarnos y daros herencia con todos los santificados.</p>
@@ -144,9 +144,9 @@ export function CalendarDashboard() {
         </blockquote>
       </section>
 
-      <aside className="rounded-lg border border-[#dbe9f4] bg-white p-4 sm:p-6" aria-labelledby="selected-day-title">
-        <div className="flex items-center justify-between gap-3">
-          <h2 id="selected-day-title" className="text-2xl font-bold text-[#092f63] sm:text-3xl">
+      <aside className="calendar-panel calendar-panel--detail rounded-lg border border-[#dbe9f4] bg-white p-4 sm:p-6" aria-labelledby="selected-day-title">
+        <div className="calendar-detail-header flex items-center justify-between gap-3">
+          <h2 id="selected-day-title" className="calendar-detail-title text-2xl font-bold text-[#092f63] sm:text-3xl">
             {formatLongDate(selectedDate)}
           </h2>
           <div className="flex gap-2">
@@ -159,12 +159,12 @@ export function CalendarDashboard() {
           </div>
         </div>
 
-        <section className="mt-7" aria-labelledby="daily-readings-title">
+        <section className="calendar-readings mt-7" aria-labelledby="daily-readings-title">
           <h3 id="daily-readings-title" className="flex items-center gap-3 text-lg font-bold text-[#0968b8]">
             <BookOpen aria-hidden="true" size={26} strokeWidth={1.8} />
             Lecturas del día
           </h3>
-          <div className="mt-3 rounded-lg bg-[#edf5fb] px-5 py-4">
+          <div className="calendar-reading-box mt-3 rounded-lg bg-[#edf5fb] px-5 py-4">
             {selectedDay ? (
               selectedDay.passages.map((passage) => (
                 <p className="text-xl font-bold leading-8 text-[#1a3f6f]" key={passage.reference}>
@@ -177,7 +177,7 @@ export function CalendarDashboard() {
           </div>
         </section>
 
-        <section className="mt-6 border-t border-[#d7e6f1] pt-5" aria-labelledby="daily-reflections-title">
+        <section className="calendar-reflections mt-6 border-t border-[#d7e6f1] pt-5" aria-labelledby="daily-reflections-title">
           <div className="flex items-center justify-between gap-3">
             <h3 id="daily-reflections-title" className="flex items-center gap-3 text-lg font-bold text-[#0968b8]">
               <MessageCircle aria-hidden="true" size={25} strokeWidth={1.8} />
@@ -185,7 +185,7 @@ export function CalendarDashboard() {
             </h3>
             <span className="text-sm text-[#6d87a6]">{dayReflections.length} reflexiones</span>
           </div>
-          <div className="mt-3 space-y-2">
+          <div className="calendar-reflection-list mt-3 space-y-2">
             {dayReflections.length > 0 ? (
               dayReflections.slice(0, 4).map((reflection) => (
                 <ReflectionCard compact key={reflection.id} reflection={reflection} />
@@ -197,7 +197,7 @@ export function CalendarDashboard() {
             )}
           </div>
           <Link
-            className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#e9f4fc] px-4 font-semibold text-[#0868b8] transition hover:bg-[#d9edfb] focus:outline-none focus:ring-2 focus:ring-[#38a7e5]"
+            className="calendar-reflections-link mt-5 flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#e9f4fc] px-4 font-semibold text-[#0868b8] transition hover:bg-[#d9edfb] focus:outline-none focus:ring-2 focus:ring-[#38a7e5]"
             href="/reflexiones"
           >
             Ver todas las reflexiones
@@ -213,7 +213,7 @@ function MonthButton({ label, onClick, children }: { label: string; onClick: () 
   return (
     <button
       aria-label={label}
-      className="grid size-12 shrink-0 place-items-center rounded-md bg-[#eef4f9] text-[#28547f] transition hover:bg-[#dcecf7] focus:outline-none focus:ring-2 focus:ring-[#38a7e5]"
+      className="calendar-icon-button grid size-12 shrink-0 place-items-center rounded-md bg-[#eef4f9] text-[#28547f] transition hover:bg-[#dcecf7] focus:outline-none focus:ring-2 focus:ring-[#38a7e5]"
       onClick={onClick}
       title={label}
       type="button"
