@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/server/whatsapp-import/importer.test.ts",
-    "import:whatsapp": "tsx scripts/import-whatsapp.ts"
+    "import:whatsapp": "tsx scripts/import-whatsapp.ts",
+    "supabase:check": "node --env-file=.env.local --import tsx scripts/check-supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.89.0",

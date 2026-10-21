@@ -69,10 +69,17 @@ scripts/import-whatsapp.ts     Entrada de línea de comandos privada
 
 ```text
 SUPABASE_URL=...
-SUPABASE_SERVICE_ROLE_KEY=...
+SUPABASE_PUBLISHABLE_KEY=...
+SUPABASE_SECRET_KEY=...
 ```
 
-La llave de servicio nunca debe llevar el prefijo `NEXT_PUBLIC_`, incluirse en el bundle del navegador ni guardarse en Git. El cliente de `src/server/supabase/admin.ts` importa `server-only` para impedir su uso accidental desde componentes públicos.
+La llave secreta nunca debe llevar el prefijo `NEXT_PUBLIC_`, incluirse en el bundle del navegador ni guardarse en Git. El cliente de `src/server/supabase/admin.ts` importa `server-only` para impedir su uso accidental desde componentes públicos. La variable heredada `SUPABASE_SERVICE_ROLE_KEY` sigue aceptándose como respaldo.
+
+Comprueba las credenciales y las políticas con:
+
+```bash
+npm run supabase:check
+```
 
 Las políticas RLS permiten leer únicamente:
 
@@ -80,6 +87,7 @@ Las políticas RLS permiten leer únicamente:
 - calendario y lecturas;
 - reflexiones con estado `authorized`;
 - recursos con `is_published = true`.
+- recitaciones semanales con `is_published = true`.
 
 Las tablas de importación no tienen políticas ni permisos públicos. La aprobación y publicación deben realizarse con procesos privados de administración.
 
