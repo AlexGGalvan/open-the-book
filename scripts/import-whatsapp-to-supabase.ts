@@ -55,8 +55,9 @@ async function main() {
   const existingReflectionResult = await admin
     .from("reflections")
     .select("source_message_hash")
+    .eq("status", "authorized")
     .limit(10_000);
-  throwOnError(existingReflectionResult.error, "No se pudieron consultar los hashes existentes");
+  throwOnError(existingReflectionResult.error, "No se pudieron consultar los hashes autorizados");
 
   const existingHashes = (existingReflectionResult.data ?? []).map((row) => row.source_message_hash as string);
   const importResult = processWhatsAppExport(source, {
@@ -226,6 +227,13 @@ async function main() {
   });
 
   if (reflectionRows.length > 0) {
+    const reviewedHashes = reflectionRows.map((row) => row.source_message_hash);
+    const clearIssuesResult = await admin
+      .from("import_issues")
+      .delete()
+      .in("source_message_hash", reviewedHashes);
+    throwOnError(clearIssuesResult.error, "No se pudieron actualizar las incidencias revisadas");
+
     const reflectionsResult = await admin
       .from("reflections")
       .upsert(reflectionRows, { onConflict: "source_message_hash" });

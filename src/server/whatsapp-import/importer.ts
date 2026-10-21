@@ -230,7 +230,9 @@ export function buildReadingPlan(readingDays: Array<{ date: string; passages: Ar
 
 function resolveReadingDate(message: ParsedMessage, reference: BibleReference, readingPlan: ReadingPlanDay[], cutoffHour: number) {
   const previousDate = shiftDate(message.localDate, -1);
-  const candidates = message.hour < cutoffHour ? [previousDate, message.localDate] : [message.localDate];
+  const candidates = message.hour < cutoffHour
+    ? [previousDate, message.localDate]
+    : [message.localDate, previousDate];
 
   for (const date of candidates) {
     if (referenceMatchesDay(reference, readingPlan.find((day) => day.date === date))) {
@@ -255,6 +257,10 @@ function referenceMatchesDay(reference: BibleReference, readingDay: ReadingPlanD
 function splitVerseAndReflection(content: string, reference: BibleReference) {
   const withoutReference = `${content.slice(0, reference.startIndex)}${content.slice(reference.endIndex)}`
     .replace(/^\s*[-–—:|]+\s*/, "")
+    .replace(
+      /^\s*(?:[\p{Extended_Pictographic}\uFE0F]\s*)*(?:\*{1,2})?lectura(?:\s+b[ií]blica)?\s+de\s+hoy(?:\*{1,2})?\s*:?\s*(?:\n+|$)/iu,
+      "",
+    )
     .trim();
   const reflectionLabel = /(?:^|\n)\s*reflexi[oó]n\s*:\s*/iu;
   const reflectionMatch = reflectionLabel.exec(withoutReference);

@@ -11,6 +11,7 @@ const readingPlan: ReadingPlanDay[] = [
 
 test("normaliza abreviaturas y rangos de versículos", () => {
   assert.equal(normalizeBibleReference("Lam 2:21")?.normalized, "Lamentaciones 2:21");
+  assert.equal(normalizeBibleReference("Lam (3:55-56)")?.normalized, "Lamentaciones 3:55-56");
   assert.equal(normalizeBibleReference("EFESIOS 4:11-12")?.normalized, "Efesios 4:11-12");
   assert.equal(normalizeBibleReference("Heb 9:27–28")?.normalized, "Hebreos 9:27-28");
 });
@@ -56,6 +57,62 @@ Debemos vivir de una manera que refleje esa luz.`;
   const result = processWhatsAppExport(source, { readingPlan, previousDayCutoffHour: 3 });
 
   assert.equal(result.records[0].readingDate, "2026-10-20");
+  assert.equal(result.records[0].status, "pending");
+});
+
+test("asigna la lectura anterior aunque la reflexión llegue después de la hora de corte", () => {
+  const source = `[10/19/26, 5:38:00 AM] Nely: Por esta causa doblo mis rodillas ante el Padre de nuestro señor Jesucristo  (Efe 3:14)
+
+Bendito el que ah recibido a Dios como su salvador 🙏`;
+  const result = processWhatsAppExport(source, {
+    readingPlan: [
+      { date: "2026-10-18", references: ["Jeremías 51-52", "Efesios 3"] },
+      ...readingPlan,
+    ],
+    previousDayCutoffHour: 3,
+  });
+
+  assert.equal(result.records[0].readingDate, "2026-10-18");
+  assert.equal(result.records[0].reference, "Efesios 3:14");
+  assert.equal(result.records[0].reflectionText, "Bendito el que ah recibido a Dios como su salvador 🙏");
+  assert.equal(result.records[0].status, "pending");
+});
+
+test("acepta una referencia entre paréntesis después del libro y omite el encabezado", () => {
+  const source = `[10/20/26, 6:57:11 AM] Nely: Lectura de hoy
+
+Invoque tu nombre, oh Jehová desde la cárcel profunda;
+Oíste mi voz, no escondas tu oído al clamor de mis suspiros.
+
+Lam (3:55-56)
+
+👉 Nos indica que aún en los problemas más difíciles, si pedimos con fé, Dios te escuchará`;
+  const result = processWhatsAppExport(source, { readingPlan });
+
+  assert.equal(result.records[0].reference, "Lamentaciones 3:55-56");
+  assert.equal(
+    result.records[0].biblicalText,
+    "Invoque tu nombre, oh Jehová desde la cárcel profunda;\nOíste mi voz, no escondas tu oído al clamor de mis suspiros.",
+  );
+  assert.equal(
+    result.records[0].reflectionText,
+    "👉 Nos indica que aún en los problemas más difíciles, si pedimos con fé, Dios te escuchará",
+  );
+  assert.equal(result.records[0].status, "pending");
+});
+
+test("conserva la separación después de una referencia sin paréntesis", () => {
+  const source = `[10/20/26, 12:29:47 AM] Alex: Antes sed benignos unos con otros, misericordiosos.
+Efesios 4:32
+
+Así como Dios nos perdona, debemos aprender a perdonar y amar a los demás.`;
+  const result = processWhatsAppExport(source, { readingPlan });
+
+  assert.equal(result.records[0].readingDate, "2026-10-19");
+  assert.equal(
+    result.records[0].reflectionText,
+    "Así como Dios nos perdona, debemos aprender a perdonar y amar a los demás.",
+  );
   assert.equal(result.records[0].status, "pending");
 });
 

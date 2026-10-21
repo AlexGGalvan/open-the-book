@@ -93,7 +93,7 @@ const bookPattern = [...canonicalByAlias.keys()]
   .join("|");
 
 const referencePattern = new RegExp(
-  `(^|[^\\p{L}\\p{N}])(${bookPattern})\\s+(\\d{1,3})(?:(?:\\s*:\\s*(\\d{1,3})(?:\\s*[-–—]\\s*(\\d{1,3}))?)|(?:\\s*[-–—]\\s*(\\d{1,3})))?`,
+  `(^|[^\\p{L}\\p{N}])(${bookPattern})\\s+(?:\\(\\s*)?(\\d{1,3})(?:(?:\\s*:\\s*(\\d{1,3})(?:\\s*[-–—]\\s*(\\d{1,3}))?)|(?:\\s*[-–—]\\s*(\\d{1,3})))?[ \\t]*\\)?`,
   "iu",
 );
 
@@ -112,7 +112,7 @@ export function normalizeBibleReference(input: string): BibleReference | null {
     return null;
   }
 
-  const startIndex = match.index + prefix.length;
+  const startIndex = prefix === "(" ? match.index : match.index + prefix.length;
   const endIndex = match.index + match[0].length;
   const chapter = Number(rawChapter);
   const chapterEnd = rawChapterEnd ? Number(rawChapterEnd) : undefined;
