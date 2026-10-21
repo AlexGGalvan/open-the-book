@@ -278,7 +278,7 @@ async function main() {
 }
 
 function normalizeDisplayName(author: string) {
-  if (author === "Tú") return process.env.WHATSAPP_SELF_NAME?.trim() || "Alex";
+  if (author === "Tú") return process.env.WHATSAPP_SELF_NAME?.trim() || "Alejandro";
   return author.replace(/[\p{Extended_Pictographic}\uFE0F]/gu, "").replace(/\s+/g, " ").trim();
 }
 
