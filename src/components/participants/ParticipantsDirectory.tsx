@@ -2,17 +2,23 @@
 
 import { Fragment, useState } from "react";
 import { ChevronDown, MessageCircle } from "lucide-react";
+import { useChurchData } from "@/components/church/ChurchDataProvider";
 import { ParticipantAvatar } from "@/components/church/ParticipantAvatar";
 import { ReflectionCard } from "@/components/church/ReflectionCard";
-import { participants, reflections } from "@/data/churchData";
 import { formatShortDate } from "@/lib/churchDates";
 
 export function ParticipantsDirectory() {
+  const { error, isLoading, participants, reflections } = useChurchData();
   const [openParticipantId, setOpenParticipantId] = useState<string | null>(null);
   const totalReflections = participants.reduce((total, participant) => total + participant.reflectionCount, 0);
 
   return (
     <>
+      {error ? (
+        <p role="alert" className="mb-4 rounded-md border border-[#efc7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9a3434]">
+          No fue posible cargar los participantes desde Supabase.
+        </p>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat value={String(participants.length)} label="Hermanos participantes" />
         <Stat value={String(totalReflections)} label="Reflexiones compartidas" />
@@ -31,6 +37,13 @@ export function ParticipantsDirectory() {
             </tr>
           </thead>
           <tbody>
+            {participants.length === 0 ? (
+              <tr className="border-t border-[#dde9f3]">
+                <td className="px-5 py-12 text-center text-[#66819e]" colSpan={5}>
+                  {isLoading ? "Cargando participantes…" : "Aún no hay participantes publicados."}
+                </td>
+              </tr>
+            ) : null}
             {participants.map((participant, index) => {
               const isOpen = openParticipantId === participant.id;
               const participantReflections = reflections.filter(
@@ -97,7 +110,7 @@ export function ParticipantsDirectory() {
                             </div>
                           ) : (
                             <p className="mt-4 rounded-md border border-dashed border-[#c9ddec] bg-white px-5 py-5 text-[#66819e]">
-                              El historial completo aparecerá aquí cuando se conecten los datos de Supabase.
+                              No hay reflexiones publicadas para este participante.
                             </p>
                           )}
                         </section>

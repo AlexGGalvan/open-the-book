@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/server/whatsapp-import/importer.test.ts",
     "import:whatsapp": "tsx scripts/import-whatsapp.ts",
+    "import:whatsapp:supabase": "node --env-file=.env.local --import tsx scripts/import-whatsapp-to-supabase.ts",
     "supabase:check": "node --env-file=.env.local --import tsx scripts/check-supabase.ts"
   },
   "dependencies": {

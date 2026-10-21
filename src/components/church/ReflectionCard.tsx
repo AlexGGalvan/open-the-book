@@ -1,10 +1,13 @@
+"use client";
+
 import { ParticipantAvatar } from "@/components/church/ParticipantAvatar";
-import { participantById } from "@/data/churchData";
+import { useChurchData } from "@/components/church/ChurchDataProvider";
 import type { Reflection } from "@/domain/church";
 import { formatSentAt } from "@/lib/churchDates";
 
 export function ReflectionCard({ reflection, compact = false }: { reflection: Reflection; compact?: boolean }) {
-  const participant = participantById.get(reflection.participantId);
+  const { participants } = useChurchData();
+  const participant = participants.find((item) => item.id === reflection.participantId);
 
   if (!participant) {
     return null;

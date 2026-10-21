@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
+import { useChurchData } from "@/components/church/ChurchDataProvider";
 import { ReflectionCard } from "@/components/church/ReflectionCard";
-import { readingDayByDate, readingDays, reflections } from "@/data/churchData";
 import { formatLongDate, shiftIsoDate, toIsoDate } from "@/lib/churchDates";
 
 const weekdays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -26,8 +26,13 @@ const monthNames = [
 const TODAY = "2026-10-20";
 
 export function CalendarDashboard() {
+  const { error, isLoading, readingDays, reflections } = useChurchData();
   const [selectedDate, setSelectedDate] = useState(TODAY);
   const [visibleMonth, setVisibleMonth] = useState({ year: 2026, month: 9 });
+  const readingDayByDate = useMemo(
+    () => new Map(readingDays.map((day) => [day.date, day])),
+    [readingDays],
+  );
   const calendarCells = useMemo(
     () => buildCalendarCells(visibleMonth.year, visibleMonth.month),
     [visibleMonth],
@@ -53,7 +58,16 @@ export function CalendarDashboard() {
   }
 
   return (
-    <div className="calendar-dashboard grid gap-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(390px,0.95fr)]">
+    <>
+      {isLoading ? (
+        <p aria-live="polite" className="mb-3 text-sm font-semibold text-[#527596]">Cargando información de la iglesia…</p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="mb-3 rounded-md border border-[#efc7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9a3434]">
+          No fue posible actualizar la información. Se muestra el calendario local sin reflexiones.
+        </p>
+      ) : null}
+      <div className="calendar-dashboard grid gap-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(390px,0.95fr)]">
       <section className="calendar-panel calendar-panel--month min-w-0 rounded-lg border border-[#dbe9f4] bg-white p-4 sm:p-6" aria-labelledby="calendar-title">
         <div className="calendar-toolbar mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -205,10 +219,10 @@ export function CalendarDashboard() {
           </Link>
         </section>
       </aside>
-    </div>
+      </div>
+    </>
   );
 }
-
 function MonthButton({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
@@ -251,5 +265,3 @@ function abbreviateReference(reference: string) {
     .replace("Colosenses", "Col")
     .replace("Tesalonicenses", "Tes");
 }
-
-export const calendarReadingDays = readingDays;

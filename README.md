@@ -2,14 +2,14 @@
 
 Aplicación web pública para organizar el plan mensual de lectura bíblica, las reflexiones compartidas por los hermanos, el historial de participantes, materiales de apoyo y la recitación semanal.
 
-La primera fase funciona con datos de ejemplo y exportación estática para GitHub Pages. El esquema de Supabase y el importador privado de WhatsApp quedan listos para la siguiente fase, sin conectar todavía una fuente de datos en vivo.
+La aplicación se exporta estáticamente a GitHub Pages y consulta en vivo los datos públicos de Supabase mediante una clave publicable y políticas RLS. La importación de WhatsApp permanece en scripts privados.
 
 ## Tecnología
 
 - Next.js 16 con App Router
 - TypeScript
 - Tailwind CSS 4
-- Supabase/PostgreSQL (esquema preparado)
+- Supabase/PostgreSQL con lectura pública protegida por RLS
 - Pruebas con `node:test` mediante `tsx`
 
 ## Secciones públicas
@@ -71,9 +71,12 @@ scripts/import-whatsapp.ts     Entrada de línea de comandos privada
 SUPABASE_URL=...
 SUPABASE_PUBLISHABLE_KEY=...
 SUPABASE_SECRET_KEY=...
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+WHATSAPP_SELF_NAME=...
 ```
 
-La llave secreta nunca debe llevar el prefijo `NEXT_PUBLIC_`, incluirse en el bundle del navegador ni guardarse en Git. El cliente de `src/server/supabase/admin.ts` importa `server-only` para impedir su uso accidental desde componentes públicos. La variable heredada `SUPABASE_SERVICE_ROLE_KEY` sigue aceptándose como respaldo.
+La llave secreta nunca debe llevar el prefijo `NEXT_PUBLIC_`, incluirse en el bundle del navegador ni guardarse en Git. Las variables públicas contienen exclusivamente la URL y la clave publicable, cuyos resultados están limitados por RLS. El cliente de `src/server/supabase/admin.ts` importa `server-only` para impedir su uso accidental desde componentes públicos. La variable heredada `SUPABASE_SERVICE_ROLE_KEY` sigue aceptándose como respaldo.
 
 Comprueba las credenciales y las políticas con:
 
@@ -101,6 +104,14 @@ npm run import:whatsapp -- "C:\ruta\exportacion.txt"
 
 La salida muestra únicamente un resumen y metadatos de revisión. No imprime el texto bíblico, la reflexión completa ni el contenido descartado.
 
+Para importar el TXT a Supabase de forma idempotente:
+
+```bash
+npm run import:whatsapp:supabase -- "C:\ruta\exportacion.txt"
+```
+
+El comando publica las reflexiones que coinciden con el calendario, conserva los casos ambiguos para revisión privada, extrae las recitaciones semanales y evita duplicados mediante el hash del mensaje.
+
 El módulo:
 
 - extrae autor, fecha, hora y contenido;
@@ -120,10 +131,8 @@ Los archivos TXT se procesan únicamente desde el entorno privado. No existe una
 
 ## Recitación semanal
 
-La recitación existente se conserva en `src/components/WeeklyRecitationCard.tsx`. Para actualizarla, cambia únicamente el arreglo `recitations`; la navegación principal la expone en `/recitacion`.
+Las recitaciones publicadas se leen desde `weekly_recitations`. La navegación principal las expone en `/recitacion` y muestra la correspondiente a la semana actual según `America/Monterrey`.
 
 ## GitHub Pages
 
-El workflow `.github/workflows/deploy-pages.yml` ejecuta el build estático y publica el contenido de `out/` después de cada push a `main` o `master`.
-
-La conexión de lectura en vivo con Supabase requerirá migrar el hosting a un entorno con servidor Next.js o consumir una API pública con acceso de solo lectura. La fase actual no expone credenciales para conservar la seguridad del proyecto.
+El workflow `.github/workflows/deploy-pages.yml` ejecuta el build estático y publica el contenido de `out/` después de cada push a `main` o `master`. La URL y la clave publicable llegan mediante variables del repositorio; la clave secreta no participa en el build.

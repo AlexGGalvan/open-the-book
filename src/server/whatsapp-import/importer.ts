@@ -30,9 +30,21 @@ export type ImportedReflection = {
 
 export type ImportResult = {
   records: ImportedReflection[];
-  ignored: Array<{ messageHash: string; reason: "no_bible_reference" | "system_message" }>;
+  ignored: Array<{
+    messageHash: string;
+    reason: "no_bible_reference" | "reading_plan_announcement" | "system_message" | "weekly_recitation";
+  }>;
   duplicates: number;
   totalMessages: number;
+};
+
+export type ImportedWeeklyRecitation = {
+  sourceMessageHash: string;
+  weekStart: string;
+  reference: string;
+  book: string;
+  biblicalText: string;
+  translation: "Reina-Valera 1960";
 };
 
 type ParsedMessage = {
@@ -47,6 +59,7 @@ type ParsedMessage = {
 
 type ImportOptions = {
   readingPlan: ReadingPlanDay[];
+  dateOrder?: "auto" | "day-first" | "month-first";
   existingHashes?: Iterable<string>;
   previousDayCutoffHour?: number;
   timezone?: string;
@@ -58,7 +71,7 @@ const dashMessagePattern = /^\s*(\d{1,2})\/(\d{1,2})\/(\d{2,4}),\s*(\d{1,2}):(\d
 export function processWhatsAppExport(source: string, options: ImportOptions): ImportResult {
   const timezone = options.timezone ?? IMPORT_TIMEZONE;
   const cutoffHour = options.previousDayCutoffHour ?? 3;
-  const messages = parseWhatsAppMessages(source, timezone);
+  const messages = parseWhatsAppMessages(source, timezone, options.dateOrder ?? "auto");
   const knownHashes = new Set(options.existingHashes ?? []);
   const seenHashes = new Set<string>();
   const records: ImportedReflection[] = [];
@@ -74,6 +87,17 @@ export function processWhatsAppExport(source: string, options: ImportOptions): I
     }
 
     seenHashes.add(messageHash);
+
+    if (isReadingPlanAnnouncement(message.content)) {
+      ignored.push({ messageHash, reason: "reading_plan_announcement" });
+      continue;
+    }
+
+    if (isWeeklyRecitationMessage(message.content)) {
+      ignored.push({ messageHash, reason: "weekly_recitation" });
+      continue;
+    }
+
     const reference = normalizeBibleReference(message.content);
 
     if (!reference) {
@@ -109,18 +133,57 @@ export function processWhatsAppExport(source: string, options: ImportOptions): I
   return { records, ignored, duplicates, totalMessages: messages.length };
 }
 
-export function parseWhatsAppMessages(source: string, timezone = IMPORT_TIMEZONE): ParsedMessage[] {
+export function extractWeeklyRecitations(
+  source: string,
+  timezone = IMPORT_TIMEZONE,
+  dateOrder: "auto" | "day-first" | "month-first" = "auto",
+): ImportedWeeklyRecitation[] {
+  const recitationsByWeek = new Map<string, ImportedWeeklyRecitation>();
+  const currentLabelPattern = /recitaci[oó]n\s+de\s+esta\s+semana\s*\.?/iu;
+  const nextLabelPattern = /recitaci[oó]n\s+de\s+pr[oó]xima\s+semana\s*\.?/iu;
+
+  for (const message of parseWhatsAppMessages(source, timezone, dateOrder)) {
+    const currentLabel = currentLabelPattern.exec(message.content);
+    if (!currentLabel?.index && currentLabel?.index !== 0) continue;
+
+    const afterCurrent = message.content.slice(currentLabel.index + currentLabel[0].length);
+    const nextLabel = nextLabelPattern.exec(afterCurrent);
+    const currentSegment = nextLabel ? afterCurrent.slice(0, nextLabel.index) : afterCurrent;
+    const currentWeekStart = startOfIsoWeek(message.localDate);
+    const sourceMessageHash = hashMessage(message);
+    const currentRecitation = parseWeeklyRecitationSegment(currentSegment, currentWeekStart, sourceMessageHash);
+    if (currentRecitation) recitationsByWeek.set(currentWeekStart, currentRecitation);
+
+    if (nextLabel) {
+      const nextSegment = afterCurrent.slice(nextLabel.index + nextLabel[0].length);
+      const nextWeekStart = shiftDate(currentWeekStart, 7);
+      const nextRecitation = parseWeeklyRecitationSegment(nextSegment, nextWeekStart, sourceMessageHash);
+      if (nextRecitation) recitationsByWeek.set(nextWeekStart, nextRecitation);
+    }
+  }
+
+  return [...recitationsByWeek.values()].sort((left, right) => left.weekStart.localeCompare(right.weekStart));
+}
+
+export function parseWhatsAppMessages(
+  source: string,
+  timezone = IMPORT_TIMEZONE,
+  dateOrder: "auto" | "day-first" | "month-first" = "auto",
+): ParsedMessage[] {
   const messages: ParsedMessage[] = [];
   let current: ParsedMessage | null = null;
+  const resolvedDateOrder = dateOrder === "auto" ? detectDateOrder(source) : dateOrder;
 
   for (const line of source.replace(/\r\n/g, "\n").split("\n")) {
     const match = bracketMessagePattern.exec(line) ?? dashMessagePattern.exec(line);
 
     if (match) {
-      const [, rawDay, rawMonth, rawYear, rawHour, rawMinute, rawSecond, meridiem, rawAuthor, firstLine] = match;
+      const [, rawFirstDatePart, rawSecondDatePart, rawYear, rawHour, rawMinute, rawSecond, meridiem, rawAuthor, firstLine] = match;
       const year = normalizeYear(Number(rawYear));
-      const month = Number(rawMonth);
-      const day = Number(rawDay);
+      const firstDatePart = Number(rawFirstDatePart);
+      const secondDatePart = Number(rawSecondDatePart);
+      const month = resolvedDateOrder === "month-first" ? firstDatePart : secondDatePart;
+      const day = resolvedDateOrder === "month-first" ? secondDatePart : firstDatePart;
       const hour = normalizeHour(Number(rawHour), meridiem);
       const minute = Number(rawMinute);
       const second = Number(rawSecond ?? 0);
@@ -145,6 +208,20 @@ export function parseWhatsAppMessages(source: string, timezone = IMPORT_TIMEZONE
   }
 
   return messages;
+}
+
+function detectDateOrder(source: string): "day-first" | "month-first" {
+  for (const line of source.replace(/\r\n/g, "\n").split("\n")) {
+    const match = bracketMessagePattern.exec(line) ?? dashMessagePattern.exec(line);
+    if (!match) continue;
+
+    const firstDatePart = Number(match[1]);
+    const secondDatePart = Number(match[2]);
+    if (firstDatePart > 12) return "day-first";
+    if (secondDatePart > 12) return "month-first";
+  }
+
+  return "day-first";
 }
 
 export function buildReadingPlan(readingDays: Array<{ date: string; passages: Array<{ reference: string }> }>): ReadingPlanDay[] {
@@ -203,11 +280,49 @@ function splitVerseAndReflection(content: string, reference: BibleReference) {
 }
 
 function cleanSection(value: string, labels: string[]) {
-  let cleaned = value.trim();
+  let cleaned = value
+    .replace(/\(\s*[\u200e\u200f\u202a-\u202e\u2066-\u2069]*\s*\)/gu, "")
+    .trim();
   for (const label of labels) {
     cleaned = cleaned.replace(new RegExp(`^${label}\\s*:\\s*`, "iu"), "");
   }
   return cleaned.trim();
+}
+
+function isReadingPlanAnnouncement(content: string) {
+  const normalized = normalizeText(content);
+  return normalized.includes("lectura biblica de hoy") && normalized.includes("pasajes de hoy");
+}
+
+function isWeeklyRecitationMessage(content: string) {
+  return normalizeText(content).includes("recitacion de esta semana");
+}
+
+function parseWeeklyRecitationSegment(
+  segment: string,
+  weekStart: string,
+  sourceMessageHash: string,
+): ImportedWeeklyRecitation | null {
+  const reference = normalizeBibleReference(segment);
+  if (!reference) return null;
+
+  const biblicalText = cleanSection(segment.slice(reference.endIndex), []);
+  if (!biblicalText) return null;
+
+  return {
+    sourceMessageHash,
+    weekStart,
+    reference: reference.normalized,
+    book: reference.book,
+    biblicalText,
+    translation: "Reina-Valera 1960",
+  };
+}
+
+function startOfIsoWeek(date: string) {
+  const utcDate = new Date(`${date}T00:00:00.000Z`);
+  const daysSinceMonday = (utcDate.getUTCDay() + 6) % 7;
+  return shiftDate(date, -daysSinceMonday);
 }
 
 function sanitizeAuthor(rawAuthor: string) {

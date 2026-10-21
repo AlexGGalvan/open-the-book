@@ -4,10 +4,11 @@ import { buildReadingPlan, processWhatsAppExport } from "../src/server/whatsapp-
 
 const sourcePath = process.argv[2];
 
-if (!sourcePath) {
-  console.error("Uso: npm run import:whatsapp -- <ruta-al-archivo.txt>");
-  process.exitCode = 1;
-} else {
+async function main() {
+  if (!sourcePath) {
+    throw new Error("Uso: npm run import:whatsapp -- <ruta-al-archivo.txt>");
+  }
+
   const source = await readFile(sourcePath, "utf8");
   const result = processWhatsAppExport(source, { readingPlan: buildReadingPlan(readingDays) });
 
@@ -34,3 +35,5 @@ if (!sourcePath) {
     ),
   );
 }
+
+void main();

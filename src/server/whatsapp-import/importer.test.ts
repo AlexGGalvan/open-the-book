@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { normalizeBibleReference } from "./bibleReferences";
-import { processWhatsAppExport, type ReadingPlanDay } from "./importer";
+import { extractWeeklyRecitations, processWhatsAppExport, type ReadingPlanDay } from "./importer";
 
 const readingPlan: ReadingPlanDay[] = [
   { date: "2026-10-19", references: ["Lamentaciones 1-2", "Efesios 4"] },
@@ -35,6 +35,17 @@ Reflexión: Ser imitadores de Dios es caminar en amor.`;
     issues: [],
     published: false,
   });
+});
+
+test("detecta fechas mes/día en exportaciones de WhatsApp en inglés", () => {
+  const source = `[10/20/26, 8:14:00 AM] Ramiro: EFESIOS 5:1-2
+Texto: Sed, pues, imitadores de Dios como hijos amados.
+Reflexión: Ser imitadores de Dios es caminar en amor.`;
+  const result = processWhatsAppExport(source, { readingPlan });
+
+  assert.equal(result.records[0].sentAt, "2026-10-20T14:14:00.000Z");
+  assert.equal(result.records[0].readingDate, "2026-10-20");
+  assert.equal(result.records[0].status, "pending");
 });
 
 test("asigna al día anterior un mensaje posterior a medianoche cuando coincide con el plan", () => {
@@ -80,6 +91,45 @@ test("ignora conversación sin cita y nunca conserva su contenido", () => {
   assert.equal(result.records.length, 0);
   assert.equal(result.ignored.length, 1);
   assert.deepEqual(Object.keys(result.ignored[0]).sort(), ["messageHash", "reason"]);
+});
+
+test("ignora anuncios del plan aunque contengan referencias", () => {
+  const source = `[10/20/26, 7:16:25 AM] Tomás: Lectura bíblica de hoy
+
+Pasajes de hoy:
+- Lamentaciones 3-5
+- Efesios 5
+
+Después de leer, compartan una frase.`;
+  const result = processWhatsAppExport(source, { readingPlan });
+
+  assert.equal(result.records.length, 0);
+  assert.equal(result.ignored.length, 1);
+  assert.equal(result.ignored[0].reason, "reading_plan_announcement");
+});
+
+test("separa recitaciones semanales de las reflexiones", () => {
+  const source = `[10/17/26, 9:54:53 AM] Celeste: Recitación de esta semana.
+
+San Mateo 10:28
+Y no temáis a los que matan el cuerpo, mas el alma no pueden matar.
+
+Recitación de próxima semana.
+
+HEBREOS 9:27-28
+Y de la manera que está establecido para los hombres que mueran una sola vez, y después de esto el juicio.`;
+  const result = processWhatsAppExport(source, { readingPlan });
+  const recitations = extractWeeklyRecitations(source);
+
+  assert.equal(result.records.length, 0);
+  assert.equal(result.ignored[0].reason, "weekly_recitation");
+  assert.deepEqual(
+    recitations.map(({ weekStart, reference }) => ({ weekStart, reference })),
+    [
+      { weekStart: "2026-10-12", reference: "Mateo 10:28" },
+      { weekStart: "2026-10-19", reference: "Hebreos 9:27-28" },
+    ],
+  );
 });
 
 test("oculta números telefónicos usados como autor", () => {

@@ -34,6 +34,22 @@ async function main() {
     throw new Error(`La lectura pública falló: ${publicParticipants.error.message}`);
   }
 
+  const publicReflections = await publicClient
+    .from("reflections")
+    .select("id", { count: "exact", head: true });
+
+  if (publicReflections.error) {
+    throw new Error(`La lectura pública de reflexiones falló: ${publicReflections.error.message}`);
+  }
+
+  const publicRecitations = await publicClient
+    .from("weekly_recitations")
+    .select("id", { count: "exact", head: true });
+
+  if (publicRecitations.error) {
+    throw new Error(`La lectura pública de recitaciones falló: ${publicRecitations.error.message}`);
+  }
+
   const privateAsAdmin = await adminClient
     .from("import_batches")
     .select("id", { count: "exact", head: true });
@@ -52,6 +68,8 @@ async function main() {
     [
       `Supabase conectado: ${new URL(supabaseUrl).host}`,
       `Participantes visibles públicamente: ${publicParticipants.count ?? 0}`,
+      `Reflexiones visibles públicamente: ${publicReflections.count ?? 0}`,
+      `Recitaciones visibles públicamente: ${publicRecitations.count ?? 0}`,
       `Lotes de importación visibles como administrador: ${privateAsAdmin.count ?? 0}`,
       "Privacidad verificada: import_batches está bloqueada para acceso público.",
     ].join("\n"),

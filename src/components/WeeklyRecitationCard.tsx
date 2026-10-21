@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { BibleVerse } from "@/components/BibleVerse";
+import { useChurchData } from "@/components/church/ChurchDataProvider";
 import type { BiblePassage } from "@/types/bible";
 
 type RecitationTab = "current" | "next";
@@ -11,41 +12,45 @@ type RecitationTab = "current" | "next";
 type RecitationItem = {
   id: RecitationTab;
   label: string;
-  passage: BiblePassage;
+  passage?: BiblePassage;
 };
-
-const recitations: RecitationItem[] = [
-  {
-    id: "current",
-    label: "Esta semana",
-    passage: {
-      reference: "San Mateo 10:28",
-      text: "Y no temáis a los que matan el cuerpo, mas el alma no pueden matar; temed más bien a aquel que puede destruir el alma y el cuerpo en el infierno.",
-      translation: "Reina-Valera 1960",
-    },
-  },
-  {
-    id: "next",
-    label: "Próxima semana",
-    passage: {
-      reference: "Hebreos 9:27-28",
-      text: "Y de la manera que está establecido para los hombres que mueran una sola vez, y después de esto el juicio, así también Cristo fue ofrecido una sola vez para llevar los pecados de muchos; y aparecerá por segunda vez, sin relación con el pecado, para salvar a los que le esperan.",
-      translation: "Reina-Valera 1960",
-    },
-  },
-];
 
 const tabClass =
   "flex min-h-11 flex-1 items-center justify-center rounded-md px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#36d9e6]";
 
 export function WeeklyRecitationCard() {
+  const { error, isLoading, weeklyRecitations } = useChurchData();
   const [activeTab, setActiveTab] = useState<RecitationTab>("current");
   const [hideCurrentVerse, setHideCurrentVerse] = useState(false);
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const recitations = useMemo<RecitationItem[]>(() => {
+    const currentWeekStart = getCurrentWeekStart();
+    const current = weeklyRecitations
+      .filter((item) => item.weekStart <= currentWeekStart)
+      .at(-1);
+    const next = weeklyRecitations.find((item) => item.weekStart > currentWeekStart);
+
+    return [
+      {
+        id: "current",
+        label: "Esta semana",
+        passage: current
+          ? { reference: current.reference, text: current.text, translation: current.translation }
+          : undefined,
+      },
+      {
+        id: "next",
+        label: "Próxima semana",
+        passage: next
+          ? { reference: next.reference, text: next.text, translation: next.translation }
+          : undefined,
+      },
+    ];
+  }, [weeklyRecitations]);
   const activeRecitation = recitations.find((item) => item.id === activeTab) ?? recitations[0];
   const activePanelId = `recitation-panel-${activeRecitation.id}`;
-  const shouldMaskVerse = activeRecitation.id === "current" && hideCurrentVerse;
-  const passage = shouldMaskVerse
+  const shouldMaskVerse = activeRecitation.id === "current" && hideCurrentVerse && activeRecitation.passage;
+  const passage = shouldMaskVerse && activeRecitation.passage
     ? {
         ...activeRecitation.passage,
         text: maskEightyPercent(activeRecitation.passage.text ?? ""),
@@ -113,11 +118,11 @@ export function WeeklyRecitationCard() {
         <div className="border-b border-[#bdeff2] pb-5">
           <p className="text-sm font-semibold text-[#007cb3]">Referencia</p>
           <p className="mt-1 font-serif text-3xl font-semibold text-[#073a5a]">
-            {activeRecitation.passage.reference}
+            {passage?.reference ?? (isLoading ? "Cargando…" : "Pendiente de publicación")}
           </p>
         </div>
 
-        {activeRecitation.id === "current" ? (
+        {activeRecitation.id === "current" && passage ? (
           <button
             aria-label={hideCurrentVerse ? "Mostrar versículo completo" : "Practicar memoria"}
             aria-pressed={hideCurrentVerse}
@@ -133,10 +138,34 @@ export function WeeklyRecitationCard() {
         <p className="mt-6 text-sm font-semibold uppercase text-[#008bb8]">
           Texto para recitar
         </p>
-        <BibleVerse passage={passage} className="mt-4" />
+        {passage ? (
+          <BibleVerse passage={passage} className="mt-4" />
+        ) : (
+          <p className="mt-4 rounded-md border border-dashed border-[#bde0eb] bg-[#f7fcff] px-5 py-8 text-center text-[#62809d]">
+            {error
+              ? "No fue posible cargar la recitación desde Supabase."
+              : isLoading
+                ? "Cargando recitación…"
+                : "Esta recitación aún no ha sido publicada."}
+          </p>
+        )}
       </div>
     </section>
   );
+}
+
+function getCurrentWeekStart() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Monterrey",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const currentDate = `${values.year}-${values.month}-${values.day}`;
+  const date = new Date(`${currentDate}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+  return date.toISOString().slice(0, 10);
 }
 
 function maskEightyPercent(text: string) {

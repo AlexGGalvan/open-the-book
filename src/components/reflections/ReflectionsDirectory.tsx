@@ -2,16 +2,22 @@
 
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useChurchData } from "@/components/church/ChurchDataProvider";
 import { ReflectionCard } from "@/components/church/ReflectionCard";
-import { participants, reflections } from "@/data/churchData";
-
-const bookFilters = ["Todas", "Lamentaciones", "Efesios", "Jeremías", "2 Corintios", "Gálatas", "Filipenses"];
-const participantNames = new Map(participants.map((participant) => [participant.id, participant.name]));
 
 export function ReflectionsDirectory() {
+  const { error, isLoading, participants, reflections } = useChurchData();
   const [query, setQuery] = useState("");
   const [book, setBook] = useState("Todas");
   const [participantId, setParticipantId] = useState("all");
+  const participantNames = useMemo(
+    () => new Map(participants.map((participant) => [participant.id, participant.name])),
+    [participants],
+  );
+  const bookFilters = useMemo(
+    () => ["Todas", ...new Set(reflections.map((reflection) => reflection.book))],
+    [reflections],
+  );
   const filteredReflections = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("es-MX");
 
@@ -25,7 +31,7 @@ export function ReflectionsDirectory() {
       const matchesParticipant = participantId === "all" || reflection.participantId === participantId;
       return matchesQuery && matchesBook && matchesParticipant;
     });
-  }, [book, participantId, query]);
+  }, [book, participantId, participantNames, query, reflections]);
 
   const hasFilters = query.length > 0 || book !== "Todas" || participantId !== "all";
 
@@ -37,6 +43,11 @@ export function ReflectionsDirectory() {
 
   return (
     <>
+      {error ? (
+        <p role="alert" className="mb-4 rounded-md border border-[#efc7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9a3434]">
+          No fue posible cargar las reflexiones desde Supabase.
+        </p>
+      ) : null}
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_300px]">
         <label className="relative block">
           <span className="sr-only">Buscar reflexiones</span>
@@ -112,10 +123,14 @@ export function ReflectionsDirectory() {
         </div>
       ) : (
         <div className="mt-3 rounded-lg border border-dashed border-[#cbddea] bg-white px-6 py-16 text-center">
-          <p className="text-lg font-semibold text-[#345a82]">No encontramos reflexiones con esos filtros.</p>
-          <button className="mt-4 font-bold text-[#0871c7]" onClick={clearFilters} type="button">
-            Mostrar todas
-          </button>
+          <p className="text-lg font-semibold text-[#345a82]">
+            {isLoading ? "Cargando reflexiones…" : "No encontramos reflexiones con esos filtros."}
+          </p>
+          {!isLoading ? (
+            <button className="mt-4 font-bold text-[#0871c7]" onClick={clearFilters} type="button">
+              Mostrar todas
+            </button>
+          ) : null}
         </div>
       )}
     </>

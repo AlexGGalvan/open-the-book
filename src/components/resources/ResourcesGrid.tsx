@@ -12,7 +12,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { resources } from "@/data/churchData";
+import { useChurchData } from "@/components/church/ChurchDataProvider";
 import type { ResourceKind } from "@/domain/church";
 
 const iconByKind: Record<ResourceKind, LucideIcon> = {
@@ -25,9 +25,16 @@ const iconByKind: Record<ResourceKind, LucideIcon> = {
 };
 
 export function ResourcesGrid() {
+  const { resources } = useChurchData();
   const [selectedResourceId, setSelectedResourceId] = useState<string | null>(null);
   const selectedResource = resources.find((resource) => resource.id === selectedResourceId);
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const resourceIsExternal = selectedResource?.downloadPath?.startsWith("http") ?? false;
+  const resourceHref = selectedResource?.downloadPath
+    ? resourceIsExternal
+      ? selectedResource.downloadPath
+      : `${basePath}${selectedResource.downloadPath}`
+    : undefined;
 
   return (
     <>
@@ -74,11 +81,13 @@ export function ResourcesGrid() {
               <X aria-hidden="true" size={20} />
             </button>
           </div>
-          {selectedResource.downloadPath && selectedResource.actionLabel ? (
+          {resourceHref && selectedResource.actionLabel ? (
             <a
               className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#1677c8] px-5 font-bold text-white transition hover:bg-[#0d67b2] focus:outline-none focus:ring-2 focus:ring-[#38a7e5]"
-              download
-              href={`${basePath}${selectedResource.downloadPath}`}
+              download={resourceIsExternal ? undefined : true}
+              href={resourceHref}
+              rel={resourceIsExternal ? "noreferrer" : undefined}
+              target={resourceIsExternal ? "_blank" : undefined}
             >
               <Download aria-hidden="true" size={19} />
               {selectedResource.actionLabel}

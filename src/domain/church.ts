@@ -42,3 +42,11 @@ export type ChurchResource = {
   actionLabel?: string;
   downloadPath?: string;
 };
+
+export type WeeklyRecitation = {
+  id: string;
+  weekStart: string;
+  reference: string;
+  text: string;
+  translation: string;
+};
