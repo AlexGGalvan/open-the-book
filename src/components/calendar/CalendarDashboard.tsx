@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { useChurchData } from "@/components/church/ChurchDataProvider";
 import { ReflectionCard } from "@/components/church/ReflectionCard";
 import { formatLongDate, shiftIsoDate, toIsoDate } from "@/lib/churchDates";
+import { getLocalDate } from "@/lib/dates";
 
 const weekdays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const monthNames = [
@@ -23,38 +24,60 @@ const monthNames = [
   "Diciembre",
 ];
 
-const TODAY = "2026-10-20";
-
 export function CalendarDashboard() {
   const { error, isLoading, readingDays, reflections } = useChurchData();
-  const [selectedDate, setSelectedDate] = useState(TODAY);
-  const [visibleMonth, setVisibleMonth] = useState({ year: 2026, month: 9 });
+  const currentDate = useSyncExternalStore<string | null>(
+    subscribeToChurchDate,
+    getChurchDateSnapshot,
+    getServerChurchDateSnapshot,
+  );
+  const [selectedDateOverride, setSelectedDate] = useState<string | null>(null);
+  const [visibleMonthOverride, setVisibleMonth] = useState<{ year: number; month: number } | null>(null);
+  const selectedDate = selectedDateOverride ?? currentDate;
+  const visibleMonth = visibleMonthOverride ?? (currentDate ? getMonthFromIsoDate(currentDate) : null);
+
   const readingDayByDate = useMemo(
     () => new Map(readingDays.map((day) => [day.date, day])),
     [readingDays],
   );
   const calendarCells = useMemo(
-    () => buildCalendarCells(visibleMonth.year, visibleMonth.month),
+    () => (visibleMonth ? buildCalendarCells(visibleMonth.year, visibleMonth.month) : []),
     [visibleMonth],
   );
-  const selectedDay = readingDayByDate.get(selectedDate);
-  const dayReflections = reflections.filter((reflection) => reflection.readingDate === selectedDate);
+  const selectedDay = selectedDate ? readingDayByDate.get(selectedDate) : undefined;
+  const dayReflections = selectedDate
+    ? reflections.filter((reflection) => reflection.readingDate === selectedDate)
+    : [];
 
   function changeMonth(offset: number) {
+    if (!visibleMonth) return;
     const next = new Date(Date.UTC(visibleMonth.year, visibleMonth.month + offset, 1));
     setVisibleMonth({ year: next.getUTCFullYear(), month: next.getUTCMonth() });
   }
 
   function selectToday() {
-    setVisibleMonth({ year: 2026, month: 9 });
-    setSelectedDate(TODAY);
+    const today = getLocalDate();
+    setVisibleMonth(getMonthFromIsoDate(today));
+    setSelectedDate(today);
   }
 
   function selectAdjacentDay(offset: number) {
+    if (!selectedDate) return;
     const nextDate = shiftIsoDate(selectedDate, offset);
-    const [year, month] = nextDate.split("-").map(Number);
     setSelectedDate(nextDate);
-    setVisibleMonth({ year, month: month - 1 });
+    setVisibleMonth(getMonthFromIsoDate(nextDate));
+  }
+
+  if (!selectedDate || !visibleMonth) {
+    return (
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        className="rounded-lg border border-[#dbe9f4] bg-white px-6 py-12 text-center font-semibold text-[#527596]"
+      >
+        Preparando el calendario…
+      </div>
+    );
   }
 
   return (
@@ -251,6 +274,23 @@ function buildCalendarCells(year: number, month: number) {
   }
 
   return cells;
+}
+
+function getMonthFromIsoDate(date: string) {
+  const [year, month] = date.split("-").map(Number);
+  return { year, month: month - 1 };
+}
+
+function subscribeToChurchDate() {
+  return () => undefined;
+}
+
+function getChurchDateSnapshot() {
+  return getLocalDate();
+}
+
+function getServerChurchDateSnapshot() {
+  return null;
 }
 
 function abbreviateReference(reference: string) {
