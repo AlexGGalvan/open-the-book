@@ -116,6 +116,23 @@ Así como Dios nos perdona, debemos aprender a perdonar y amar a los demás.`;
   assert.equal(result.records[0].status, "pending");
 });
 
+test("une versículo, referencia y reflexión enviados por separado", () => {
+  const source = `[10/21/26, 5:56:37 PM] Hortensia: La gracia sea con todos los que aman a nuestro Señor Jesucristo con amor inalterable. Amén.
+[10/21/26, 5:56:52 PM] Hortensia: Efesios 6:24
+[10/21/26, 6:00:00 PM] Hortensia: Amor eterno`;
+  const result = processWhatsAppExport(source, { readingPlan });
+
+  assert.equal(result.totalMessages, 3);
+  assert.equal(result.records.length, 1);
+  assert.equal(result.records[0].reference, "Efesios 6:24");
+  assert.equal(
+    result.records[0].biblicalText,
+    "La gracia sea con todos los que aman a nuestro Señor Jesucristo con amor inalterable. Amén.",
+  );
+  assert.equal(result.records[0].reflectionText, "Amor eterno");
+  assert.equal(result.records[0].status, "pending");
+});
+
 test("evita duplicados dentro del archivo y contra hashes existentes", () => {
   const message = `[20/10/2026, 09:02] Ana: Lam 3:22-23
 Texto: Nuevas son cada mañana sus misericordias.

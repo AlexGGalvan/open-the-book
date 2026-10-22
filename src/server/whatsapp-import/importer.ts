@@ -71,7 +71,8 @@ const dashMessagePattern = /^\s*(\d{1,2})\/(\d{1,2})\/(\d{2,4}),\s*(\d{1,2}):(\d
 export function processWhatsAppExport(source: string, options: ImportOptions): ImportResult {
   const timezone = options.timezone ?? IMPORT_TIMEZONE;
   const cutoffHour = options.previousDayCutoffHour ?? 3;
-  const messages = parseWhatsAppMessages(source, timezone, options.dateOrder ?? "auto");
+  const parsedMessages = parseWhatsAppMessages(source, timezone, options.dateOrder ?? "auto");
+  const messages = mergeSplitReflectionMessages(parsedMessages);
   const knownHashes = new Set(options.existingHashes ?? []);
   const seenHashes = new Set<string>();
   const records: ImportedReflection[] = [];
@@ -130,7 +131,7 @@ export function processWhatsAppExport(source: string, options: ImportOptions): I
     });
   }
 
-  return { records, ignored, duplicates, totalMessages: messages.length };
+  return { records, ignored, duplicates, totalMessages: parsedMessages.length };
 }
 
 export function extractWeeklyRecitations(
@@ -208,6 +209,68 @@ export function parseWhatsAppMessages(
   }
 
   return messages;
+}
+
+function mergeSplitReflectionMessages(messages: ParsedMessage[]) {
+  const merged: ParsedMessage[] = [];
+
+  for (let index = 0; index < messages.length; index += 1) {
+    const biblicalTextMessage = messages[index];
+    const referenceMessage = messages[index + 1];
+    const reflectionMessage = messages[index + 2];
+
+    if (canMergeSplitReflection(biblicalTextMessage, referenceMessage, reflectionMessage)) {
+      merged.push({
+        ...referenceMessage,
+        content: [biblicalTextMessage.content, referenceMessage.content, reflectionMessage.content].join("\n\n"),
+      });
+      index += 2;
+      continue;
+    }
+
+    merged.push(biblicalTextMessage);
+  }
+
+  return merged;
+}
+
+function canMergeSplitReflection(
+  biblicalTextMessage: ParsedMessage | undefined,
+  referenceMessage: ParsedMessage | undefined,
+  reflectionMessage: ParsedMessage | undefined,
+) {
+  if (!biblicalTextMessage || !referenceMessage || !reflectionMessage) return false;
+
+  const author = normalizeText(referenceMessage.rawAuthor);
+  if (
+    normalizeText(biblicalTextMessage.rawAuthor) !== author
+    || normalizeText(reflectionMessage.rawAuthor) !== author
+  ) {
+    return false;
+  }
+
+  const reference = normalizeBibleReference(referenceMessage.content);
+  if (
+    !reference
+    || !isReferenceOnly(referenceMessage.content, reference)
+    || normalizeBibleReference(biblicalTextMessage.content)
+    || normalizeBibleReference(reflectionMessage.content)
+  ) {
+    return false;
+  }
+
+  return isWithinMergeWindow(biblicalTextMessage, referenceMessage)
+    && isWithinMergeWindow(referenceMessage, reflectionMessage);
+}
+
+function isReferenceOnly(content: string, reference: BibleReference) {
+  const remainder = `${content.slice(0, reference.startIndex)}${content.slice(reference.endIndex)}`;
+  return remainder.replace(/[\p{P}\p{S}\s]/gu, "") === "";
+}
+
+function isWithinMergeWindow(earlier: ParsedMessage, later: ParsedMessage) {
+  const difference = Date.parse(later.sentAt) - Date.parse(earlier.sentAt);
+  return difference >= 0 && difference <= 5 * 60 * 1_000;
 }
 
 function detectDateOrder(source: string): "day-first" | "month-first" {
