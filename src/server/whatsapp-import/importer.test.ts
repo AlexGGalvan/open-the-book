@@ -12,6 +12,7 @@ const readingPlan: ReadingPlanDay[] = [
 test("normaliza abreviaturas y rangos de versículos", () => {
   assert.equal(normalizeBibleReference("Lam 2:21")?.normalized, "Lamentaciones 2:21");
   assert.equal(normalizeBibleReference("Lam (3:55-56)")?.normalized, "Lamentaciones 3:55-56");
+  assert.equal(normalizeBibleReference("Ezeq 6:13")?.normalized, "Ezequiel 6:13");
   assert.equal(normalizeBibleReference("EFESIOS 4:11-12")?.normalized, "Efesios 4:11-12");
   assert.equal(normalizeBibleReference("Heb 9:27–28")?.normalized, "Hebreos 9:27-28");
 });
@@ -130,6 +131,24 @@ test("une versículo, referencia y reflexión enviados por separado", () => {
     "La gracia sea con todos los que aman a nuestro Señor Jesucristo con amor inalterable. Amén.",
   );
   assert.equal(result.records[0].reflectionText, "Amor eterno");
+  assert.equal(result.records[0].status, "pending");
+});
+
+test("une una reflexión dividida aunque haya mensajes eliminados entre sus partes", () => {
+  const source = `[10/23/26, 8:39:00 PM] Hortensia: Por tanto, si hay alguna consolación en Cristo, si algún consuelo de amor.
+[10/23/26, 8:42:00 PM] Hortensia: _Se eliminó este mensaje_
+[10/23/26, 8:44:00 PM] Hortensia: _Se eliminó este mensaje_
+[10/23/26, 8:45:00 PM] Hortensia: _Se eliminó este mensaje_
+[10/23/26, 8:51:00 PM] Hortensia: Filipenses 2:1
+[10/23/26, 8:52:00 PM] Hortensia: Sana el alma`;
+  const result = processWhatsAppExport(source, {
+    readingPlan: [{ date: "2026-10-23", references: ["Ezequiel 6-7", "Filipenses 2"] }],
+  });
+
+  assert.equal(result.totalMessages, 6);
+  assert.equal(result.records.length, 1);
+  assert.equal(result.records[0].reference, "Filipenses 2:1");
+  assert.equal(result.records[0].reflectionText, "Sana el alma");
   assert.equal(result.records[0].status, "pending");
 });
 

@@ -36,7 +36,7 @@ const bookAliases: Record<string, string[]> = {
   Isaías: ["isaias", "isa", "is"],
   Jeremías: ["jeremias", "jer", "jr"],
   Lamentaciones: ["lamentaciones", "lam", "lm"],
-  Ezequiel: ["ezequiel", "eze", "ezq", "ez"],
+  Ezequiel: ["ezequiel", "ezeq", "eze", "ezq", "ez"],
   Daniel: ["daniel", "dan", "dn"],
   Oseas: ["oseas", "ose", "os"],
   Joel: ["joel", "jl"],

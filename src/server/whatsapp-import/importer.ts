@@ -212,12 +212,13 @@ export function parseWhatsAppMessages(
 }
 
 function mergeSplitReflectionMessages(messages: ParsedMessage[]) {
+  const mergeCandidates = messages.filter((message) => !isDeletedMessage(message.content));
   const merged: ParsedMessage[] = [];
 
-  for (let index = 0; index < messages.length; index += 1) {
-    const biblicalTextMessage = messages[index];
-    const referenceMessage = messages[index + 1];
-    const reflectionMessage = messages[index + 2];
+  for (let index = 0; index < mergeCandidates.length; index += 1) {
+    const biblicalTextMessage = mergeCandidates[index];
+    const referenceMessage = mergeCandidates[index + 1];
+    const reflectionMessage = mergeCandidates[index + 2];
 
     if (canMergeSplitReflection(biblicalTextMessage, referenceMessage, reflectionMessage)) {
       merged.push({
@@ -270,7 +271,11 @@ function isReferenceOnly(content: string, reference: BibleReference) {
 
 function isWithinMergeWindow(earlier: ParsedMessage, later: ParsedMessage) {
   const difference = Date.parse(later.sentAt) - Date.parse(earlier.sentAt);
-  return difference >= 0 && difference <= 5 * 60 * 1_000;
+  return difference >= 0 && difference <= 15 * 60 * 1_000;
+}
+
+function isDeletedMessage(content: string) {
+  return normalizeText(content).includes("se elimino este mensaje");
 }
 
 function detectDateOrder(source: string): "day-first" | "month-first" {
