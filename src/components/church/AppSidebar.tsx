@@ -14,15 +14,16 @@ import {
 type NavigationItem = {
   href: string;
   label: string;
+  mobileLabel: string;
   Icon: LucideIcon;
 };
 
 const navigationItems: NavigationItem[] = [
-  { href: "/", label: "Calendario", Icon: CalendarDays },
-  { href: "/reflexiones", label: "Reflexiones", Icon: MessageCircle },
-  { href: "/participantes", label: "Participantes", Icon: UsersRound },
-  { href: "/recursos", label: "Recursos", Icon: BookOpen },
-  { href: "/recitacion", label: "Recitación semanal", Icon: BookMarked },
+  { href: "/", label: "Calendario", mobileLabel: "Inicio", Icon: CalendarDays },
+  { href: "/reflexiones", label: "Reflexiones", mobileLabel: "Reflexiones", Icon: MessageCircle },
+  { href: "/participantes", label: "Participantes", mobileLabel: "Personas", Icon: UsersRound },
+  { href: "/recursos", label: "Recursos", mobileLabel: "Recursos", Icon: BookOpen },
+  { href: "/recitacion", label: "Recitación semanal", mobileLabel: "Recitación", Icon: BookMarked },
 ];
 
 function normalizePath(pathname: string) {
@@ -47,23 +48,25 @@ export function AppSidebar() {
 
       <nav
         aria-label="Secciones principales"
-        className="border-b border-[#dbeaf6] bg-white px-3 py-2 lg:hidden"
+        className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t border-[#cfe2f0] bg-white/95 px-1 pt-1 shadow-[0_-8px_28px_rgba(20,74,116,0.12)] backdrop-blur lg:hidden"
       >
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="grid grid-cols-5">
           {navigationItems.map((item) => {
             const selected = pathname === item.href;
 
             return (
               <Link
                 aria-current={selected ? "page" : undefined}
-                className={`flex min-h-12 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#38a7e5] ${
-                  selected ? "bg-[#1677c8] text-white" : "bg-[#eef6fd] text-[#244b78] hover:bg-[#deeffc]"
+                aria-label={item.label}
+                className={`relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[9px] font-semibold leading-3 transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#38a7e5] min-[360px]:text-[10px] ${
+                  selected ? "text-[#0b70bd]" : "text-[#557493] active:text-[#0b70bd]"
                 }`}
                 href={item.href}
                 key={item.href}
               >
-                <item.Icon aria-hidden="true" size={18} strokeWidth={1.9} />
-                <span>{item.label}</span>
+                {selected ? <span aria-hidden="true" className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-[#1387d5]" /> : null}
+                <item.Icon aria-hidden="true" size={21} strokeWidth={selected ? 2.2 : 1.8} />
+                <span className="whitespace-nowrap">{item.mobileLabel}</span>
               </Link>
             );
           })}

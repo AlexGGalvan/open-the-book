@@ -16,18 +16,18 @@ export function ChurchHeader() {
         />
       </div>
 
-      <div className="flex h-28 items-center gap-4 px-4 md:hidden">
+      <div className="flex h-20 items-center gap-3 px-4 md:hidden">
         <Image
           alt="Logo de la Iglesia de Torreón"
-          className="size-20 shrink-0 object-contain"
-          height={80}
+          className="size-14 shrink-0 object-contain"
+          height={56}
           priority
           src={`${basePath}/logos/recitation-logo.png`}
-          width={80}
+          width={56}
         />
         <div className="min-w-0">
-          <p className="font-serif text-3xl font-bold leading-none text-[#082b59]">Iglesia de Torreón</p>
-          <p className="mt-2 text-xs font-semibold uppercase text-[#315b8f]">Lectura diaria</p>
+          <p className="font-serif text-[1.45rem] font-bold leading-none text-[#082b59] min-[360px]:text-[1.7rem]">Iglesia de Torreón</p>
+          <p className="mt-1.5 text-[10px] font-semibold uppercase text-[#315b8f]">Lectura diaria</p>
         </div>
       </div>
     </header>

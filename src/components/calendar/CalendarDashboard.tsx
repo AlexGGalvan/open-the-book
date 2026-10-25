@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
+import { MobileCalendarDashboard } from "@/components/calendar/MobileCalendarDashboard";
 import { useChurchData } from "@/components/church/ChurchDataProvider";
 import { ReflectionCard } from "@/components/church/ReflectionCard";
 import { formatLongDate, shiftIsoDate, toIsoDate } from "@/lib/churchDates";
-import { getLocalDate } from "@/lib/dates";
+import { getLocalDate, getStartOfWeekDateKey } from "@/lib/dates";
 
 const weekdays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const monthNames = [
@@ -25,7 +26,7 @@ const monthNames = [
 ];
 
 export function CalendarDashboard() {
-  const { error, isLoading, readingDays, reflections } = useChurchData();
+  const { error, isLoading, readingDays, reflections, weeklyRecitations } = useChurchData();
   const currentDate = useSyncExternalStore<string | null>(
     subscribeToChurchDate,
     getChurchDateSnapshot,
@@ -51,6 +52,17 @@ export function CalendarDashboard() {
       .slice(0, 4),
     [reflections],
   );
+  const { currentRecitation, nextRecitation } = useMemo(() => {
+    if (!currentDate) return {};
+
+    const currentWeekStart = getStartOfWeekDateKey(currentDate, 1);
+    return {
+      currentRecitation: weeklyRecitations
+        .filter((recitation) => recitation.weekStart <= currentWeekStart)
+        .at(-1),
+      nextRecitation: weeklyRecitations.find((recitation) => recitation.weekStart > currentWeekStart),
+    };
+  }, [currentDate, weeklyRecitations]);
 
   function changeMonth(offset: number) {
     if (!visibleMonth) return;
@@ -93,7 +105,23 @@ export function CalendarDashboard() {
           No fue posible actualizar la información. Se muestra el calendario local sin reflexiones.
         </p>
       ) : null}
-      <div className="calendar-dashboard grid gap-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(390px,0.95fr)]">
+      <MobileCalendarDashboard
+        calendarCells={calendarCells}
+        currentDate={currentDate ?? selectedDate}
+        currentRecitation={currentRecitation}
+        latestReflections={latestReflections}
+        nextRecitation={nextRecitation}
+        onChangeMonth={changeMonth}
+        onSelectAdjacentDay={selectAdjacentDay}
+        onSelectDate={setSelectedDate}
+        onSelectToday={selectToday}
+        readingDayByDate={readingDayByDate}
+        selectedDate={selectedDate}
+        selectedDay={selectedDay}
+        visibleMonth={visibleMonth}
+      />
+
+      <div className="calendar-dashboard hidden gap-5 md:grid 2xl:grid-cols-[minmax(0,1.35fr)_minmax(390px,0.95fr)]">
       <section className="calendar-panel calendar-panel--month min-w-0 rounded-lg border border-[#dbe9f4] bg-white p-4 sm:p-6" aria-labelledby="calendar-title">
         <div className="calendar-toolbar mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
