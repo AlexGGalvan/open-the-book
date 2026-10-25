@@ -45,9 +45,12 @@ export function CalendarDashboard() {
     [visibleMonth],
   );
   const selectedDay = selectedDate ? readingDayByDate.get(selectedDate) : undefined;
-  const dayReflections = selectedDate
-    ? reflections.filter((reflection) => reflection.readingDate === selectedDate)
-    : [];
+  const latestReflections = useMemo(
+    () => [...reflections]
+      .sort((left, right) => Date.parse(right.sentAt) - Date.parse(left.sentAt))
+      .slice(0, 4),
+    [reflections],
+  );
 
   function changeMonth(offset: number) {
     if (!visibleMonth) return;
@@ -214,22 +217,22 @@ export function CalendarDashboard() {
           </div>
         </section>
 
-        <section className="calendar-reflections mt-6 border-t border-[#d7e6f1] pt-5" aria-labelledby="daily-reflections-title">
+        <section className="calendar-reflections mt-6 border-t border-[#d7e6f1] pt-5" aria-labelledby="latest-reflections-title">
           <div className="flex items-center justify-between gap-3">
-            <h3 id="daily-reflections-title" className="flex items-center gap-3 text-lg font-bold text-[#0968b8]">
+            <h3 id="latest-reflections-title" className="flex items-center gap-3 text-lg font-bold text-[#0968b8]">
               <MessageCircle aria-hidden="true" size={25} strokeWidth={1.8} />
-              Reflexiones del día
+              Últimas reflexiones
             </h3>
-            <span className="text-sm text-[#6d87a6]">{dayReflections.length} reflexiones</span>
+            <span className="text-sm text-[#6d87a6]">{latestReflections.length} recientes</span>
           </div>
           <div className="calendar-reflection-list mt-3 space-y-2">
-            {dayReflections.length > 0 ? (
-              dayReflections.slice(0, 4).map((reflection) => (
+            {latestReflections.length > 0 ? (
+              latestReflections.map((reflection) => (
                 <ReflectionCard compact key={reflection.id} reflection={reflection} />
               ))
             ) : (
               <div className="rounded-lg border border-dashed border-[#cbddea] px-4 py-8 text-center text-[#7189a5]">
-                Aún no hay reflexiones publicadas para este día.
+                Aún no hay reflexiones publicadas.
               </div>
             )}
           </div>
