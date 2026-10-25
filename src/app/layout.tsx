@@ -18,15 +18,25 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+const siteUrl = "https://alexggalvan.github.io/open-the-book/";
+const churchLogoUrl = `${siteUrl}logos/recitation-logo.png`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://alexggalvan.github.io/open-the-book/"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Iglesia de Torreón | Lectura diaria",
     template: "%s | Iglesia de Torreón",
   },
   description: "Lecturas bíblicas diarias, reflexiones y recursos de la Iglesia de Torreón.",
   applicationName: "Iglesia de Torreón - Lectura diaria",
-  manifest: "/manifest.json",
+  alternates: {
+    canonical: siteUrl,
+  },
+  manifest: `${siteUrl}manifest.json`,
+  icons: {
+    icon: [{ url: churchLogoUrl, sizes: "512x512", type: "image/png" }],
+    apple: [{ url: churchLogoUrl, sizes: "512x512", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -35,7 +45,25 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Iglesia de Torreón | Lectura diaria",
     description: "Lecturas bíblicas diarias, reflexiones y recursos de la Iglesia de Torreón.",
+    url: siteUrl,
+    siteName: "Iglesia de Torreón",
+    locale: "es_MX",
     type: "website",
+    images: [
+      {
+        url: churchLogoUrl,
+        width: 512,
+        height: 512,
+        alt: "Logotipo de la Iglesia de Torreón",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Iglesia de Torreón | Lectura diaria",
+    description: "Lecturas bíblicas diarias, reflexiones y recursos de la Iglesia de Torreón.",
+    images: [churchLogoUrl],
   },
 };
 
