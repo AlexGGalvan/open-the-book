@@ -196,17 +196,23 @@ async function main() {
   }
 
   const authorizedAt = new Date().toISOString();
-  const reflectionRows = importResult.records.map((record) => {
+  const recordsWithoutReadingDay: typeof importResult.records = [];
+  const reflectionRows = importResult.records.flatMap((record) => {
     const parsed = normalizeBibleReference(record.reference);
     const participantId = participantIdByAuthor.get(record.author);
     const readingDayId = readingDayIds.get(record.readingDate);
 
-    if (!parsed || !participantId || !readingDayId) {
+    if (!parsed || !participantId) {
       throw new Error(`No se pudo relacionar la reflexión ${record.messageHash}.`);
     }
 
+    if (!readingDayId) {
+      recordsWithoutReadingDay.push(record);
+      return [];
+    }
+
     const authorized = record.status === "pending";
-    return {
+    return [{
       participant_id: participantId,
       reading_day_id: readingDayId,
       sent_at: record.sentAt,
@@ -223,7 +229,7 @@ async function main() {
       status: authorized ? "authorized" : "ambiguous",
       source_message_hash: record.messageHash,
       authorized_at: authorized ? authorizedAt : null,
-    };
+    }];
   });
 
   if (reflectionRows.length > 0) {
@@ -271,6 +277,7 @@ async function main() {
       `Reflexiones autorizadas e importadas: ${authorizedCount}`,
       `Mensajes ambiguos para revisión privada: ${ambiguousCount}`,
       `Recitaciones semanales publicadas: ${weeklyRecitations.length}`,
+      `Casos sin día de lectura conservados solo para revisión: ${recordsWithoutReadingDay.length}`,
       `Mensajes ignorados sin conservar contenido: ${importResult.ignored.length}`,
       `Duplicados omitidos: ${importResult.duplicates}`,
     ].join("\n"),
